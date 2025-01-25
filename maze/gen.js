@@ -5,20 +5,19 @@ const ctx = cv.getContext("2d");
 var mazecols = 10;
 var mazerows = 10;
 var cellsize = 30; // in pixels
+var drawpath = false;
+var paramsupdated = false;
 
-drawmaze()
+var mcells; // cell array
 
-function drawmaze() {
+genmaze()
 
-    
+// Generate a new maze based on input parameters 
+function genmaze() {
     mazecols = document.getElementById("mazeinputcols").value;
     mazerows = document.getElementById("mazeinputrows").value;
-    
-    cv.width = mazecols*cellsize;
-    cv.height = mazerows*cellsize
-    
-    // initialize cell array
-    let mcells = Array();
+    // reinitialize cell array based on parameters
+    mcells = Array();
     for (let i = 0; i < mazecols; i++) {
         let row = Array();
         for (let j = 0; j < mazerows; j++) {
@@ -26,11 +25,11 @@ function drawmaze() {
         }
         mcells.push(row);
     }
-    
-    // backtracking method
+    // "recursive" backtracking method
+    // pathing/state info is stored in the cells array itself so recursion isnt needed
     let start = [0, 0];
     let cur = start;
-    let backToStartNoMoreNeighbors = false
+    let backToStartNoMoreNeighbors = false // prevents below loop exiting if it backtracks all the way to start, but still has a neighbor it can tunnel to from there
     do {
         mcells[cur[0]][cur[1]].visited = true
         let ns = Array() // unvisited neighbors
@@ -70,44 +69,90 @@ function drawmaze() {
             //console.log("tunneling to " + pick)
         }
     } while (!(cur[0] == start[0] && cur[1] == start[1]) && !backToStartNoMoreNeighbors)
+
+    drawmaze()
+}
+
+// Draw maze as stored in mcells[][]
+function drawmaze() {
+
+    drawpath = document.getElementById("mazeshowpath").checked;
+    cv.width = mazecols*cellsize + 10
+    cv.height = mazerows*cellsize + 10
         
     ctx.lineWidth = 2;
+    ctx.rect(0,0,cv.width,cv.height)
+    ctx.fillStyle = "white"
+    ctx.fill()
     ctx.beginPath();
-    // draw maze walls
+    // draw maze
+    // FYI each lineTo/moveTo call has "5 + ..." so the maze has an outer margin. is there a better way to do this? who knows
     for (let i = 0; i < mazecols; i++) {
         for (let j = 0; j < mazerows; j++) {
-            ctx.moveTo((i+1)*cellsize, j*cellsize);
+            ctx.moveTo(5 + (i+1)*cellsize, 5 + j*cellsize);
             // bottom wall
-            if (mcells[i][j].bottom == true || i == mazecols-1) {
-                ctx.lineTo((i+1)*cellsize, (j+1)*cellsize);
+            if ((mcells[i][j].bottom == true || i == mazecols-1)) {
+                if (i == mazecols-1 && j == mazerows-1) {
+                    ctx.moveTo(5 + (i+1)*cellsize, 5 + (j+1)*cellsize); // i can't wrap my head around the logic right now to get the openings so ill just leave this here. forgive me
+                }
+                ctx.lineTo(5 + (i+1)*cellsize, 5 + (j+1)*cellsize);
             } else {
-                ctx.moveTo((i+1)*cellsize, (j+1)*cellsize);
+                ctx.moveTo(5 + (i+1)*cellsize, 5 + (j+1)*cellsize);
             }
             // right wall
             if (mcells[i][j].right == true || j == mazerows-1) {
-                ctx.lineTo(i*cellsize, (j+1)*cellsize);
-        } else {
-            ctx.moveTo(i*cellsize, (j+1)*cellsize);
-        }
-        // border walls
-        if (i == 0) {
-            ctx.lineTo(i*cellsize, j*cellsize);
-        } else {
-            ctx.moveTo(i*cellsize, j*cellsize);
-        }
-        if (j == 0) {
-            ctx.lineTo((i+1)*cellsize, j*cellsize);
-        } else {
-            ctx.moveTo((i+1)*cellsize, j*cellsize);
+                ctx.lineTo(5 + i*cellsize, 5 + (j+1)*cellsize);
+            } else {
+                ctx.moveTo(5 + i*cellsize, 5 + (j+1)*cellsize);
+            }
+            // border walls
+            if (i == 0 && j > 0) {
+                ctx.lineTo(5 + i*cellsize, 5 +  j*cellsize);
+            } else {
+                ctx.moveTo(5 + i*cellsize, 5 + j*cellsize);
+            }
+            if (j == 0) {
+                ctx.lineTo(5 + (i+1)*cellsize, 5 + j*cellsize);
+            } else {
+                ctx.moveTo(5 + (i+1)*cellsize, 5 + j*cellsize);
+            }
         }
     }
+    
+    ctx.strokeStyle = "black"
     ctx.stroke();
-}
-
+    
+    draw_path()
+    
     // center the maze onscreen
     document.getElementById("mazeCanvas").style.position = "relative";
     document.getElementById("mazeCanvas").style.left = "50%";
     document.getElementById("mazeCanvas").style.right = "50%";
     document.getElementById("mazeCanvas").style.transform = "translate(-50%, 0)"
+}
 
+// Draw the path from target to start cell as stored in mcells[][]
+function draw_path() {
+    // assuming the target is always the bottom right corner for now
+    let c = [mazecols-1, mazerows-1];
+    let plen = 0;
+    if (drawpath) {
+        ctx.beginPath()
+        ctx.moveTo(cv.width, 5 + c[1]*cellsize + (cellsize/2))
+        ctx.lineTo(5 + (c[0]*cellsize) + (cellsize/2), 5 + c[1]*cellsize + (cellsize/2))
+    }
+    do {
+        plen++;
+        c = mcells[c[0]][c[1]].prev
+        if (drawpath) {
+            ctx.lineTo(5 + (c[0]*cellsize) + (cellsize/2), 5 + c[1]*cellsize + (cellsize/2))
+        }
+    } while (!(c[0] == 0 && c[1] == 0))
+    if (drawpath) {
+        ctx.lineTo(0, 5 + c[1]*cellsize + (cellsize/2))
+        ctx.strokeStyle = "red"
+        ctx.stroke()
+    }
+    
+    document.getElementById("mazestatspathlength").innerText = "Path length: " + plen;
 }

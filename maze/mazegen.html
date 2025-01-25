@@ -6,15 +6,22 @@
 <body>
     <canvas id="mazeCanvas"></canvas>
     <div id="controls">
-        <button id="mazegenerate" onclick="drawmaze()"> Generate </button>
+        <button id="mazegenerate" onclick="genmaze()"> Generate </button>
         <div class="numinput">
-            <p> Rows </p>
-            <input type="number" id="mazeinputrows" min="1" max="50" value="10">   
+            <input type="number" id="mazeinputrows" min="2" max="100" value="10">
+            <label for="mazeinputrows">Rows</label> 
+ 
         </div>
         <div class="numinput">
-            <p> Columns </p>
-            <input type="number" id="mazeinputcols" min="1" max="50" value="10">   
+            <input type="number" id="mazeinputcols" min="2" max="100" value="10">  
+            <label for="mazeinputcols">Columns</label> 
         </div>
+        <input type="checkbox" id="mazeshowpath" onchange="drawmaze()">
+        <label for="mazeshowpath">Draw Path</label><br>
+    </div>
+    <hr>
+    <div id="stats">
+        <h2 id="mazestatspathlength"></h2>
     </div>
 </body>
 <script src="gen.js"> </script>

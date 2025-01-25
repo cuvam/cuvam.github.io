@@ -1,3 +1,7 @@
+body {
+    background-color: burlywood;
+}
+
 canvas {
     text-align: center;
     margin-bottom: 5px;
@@ -9,6 +13,10 @@ canvas {
     text-align: left;
 }
 
+#stats {
+    text-align: center;
+}
+
 #mazegenerate {
     display: block;
     margin: auto;
@@ -18,14 +26,15 @@ canvas {
 }
 
 .numinput {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
-p {
+label {
     display: inline; 
     font-size: 125%;
     margin-right: 50px;
     text-align: auto;
+    vertical-align: middle;
 }
 
 input {
