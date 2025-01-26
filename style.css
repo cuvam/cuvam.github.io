@@ -1,0 +1,18 @@
+body {
+    font-size: 125%;
+}
+
+.cs-btn {
+    margin: 5px;
+}
+
+.cs-tabs {
+    margin: 10px;
+    width: 50%;
+    transform: translate(50%, 0);
+}
+
+footer {
+    text-align: center;
+    font-size: 75%;
+}
