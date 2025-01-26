@@ -2,44 +2,38 @@ body {
     background-color: burlywood;
 }
 
-canvas {
-    text-align: center;
-    margin-bottom: 5px;
-}
-
 #controls {
-    width: 20%;
-    transform: translate(200%, 0);
-    text-align: left;
+    border-style: inset;
+    block-size: auto;
+    width: fit-content;
+    margin: 5px;
 }
 
-#stats {
+div {
     text-align: center;
+    width: fit-content;
+    margin: 5px;
 }
 
 #mazegenerate {
-    display: block;
-    margin: auto;
-    margin-top: 0.5%;
-    margin-bottom: 2%;
     font-size: 150%;
-}
-
-.numinput {
-    margin-bottom: 15px;
+    margin: 5px;
 }
 
 label {
     display: inline; 
     font-size: 125%;
-    margin-right: 50px;
     text-align: auto;
     vertical-align: middle;
+    margin: 5px;
 }
 
 input {
     display: inline;
-    float: right;
-    font-size: 125%;
-    text-align: right;
+    margin: 5px;
+}
+
+canvas {
+    display: block;
+    margin: 5px; 
 }

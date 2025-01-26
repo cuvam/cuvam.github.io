@@ -14,8 +14,8 @@ genmaze()
 
 // Generate a new maze based on input parameters 
 function genmaze() {
-    mazecols = document.getElementById("mazeinputcols").value;
-    mazerows = document.getElementById("mazeinputrows").value;
+    mazecols = Math.max(2, document.getElementById("mazeinputcols").value);
+    mazerows = Math.max(2, document.getElementById("mazeinputrows").value);
     // reinitialize cell array based on parameters
     mcells = Array();
     for (let i = 0; i < mazecols; i++) {
@@ -80,55 +80,53 @@ function drawmaze() {
     cv.width = mazecols*cellsize + 10
     cv.height = mazerows*cellsize + 10
         
-    ctx.lineWidth = 2;
+    // white background
     ctx.rect(0,0,cv.width,cv.height)
     ctx.fillStyle = "white"
     ctx.fill()
+
+    // maze walls
+    ctx.lineWidth = 2;
+    ctx.lineCap = "square";
+    ctx.strokeStyle = "black"
+    ctx.translate(5, 5);
     ctx.beginPath();
-    // draw maze
-    // FYI each lineTo/moveTo call has "5 + ..." so the maze has an outer margin. is there a better way to do this? who knows
     for (let i = 0; i < mazecols; i++) {
         for (let j = 0; j < mazerows; j++) {
-            ctx.moveTo(5 + (i+1)*cellsize, 5 + j*cellsize);
+            ctx.moveTo((i+1)*cellsize, j*cellsize);
             // bottom wall
             if ((mcells[i][j].bottom == true || i == mazecols-1)) {
                 if (i == mazecols-1 && j == mazerows-1) {
-                    ctx.moveTo(5 + (i+1)*cellsize, 5 + (j+1)*cellsize); // i can't wrap my head around the logic right now to get the openings so ill just leave this here. forgive me
+                    ctx.moveTo((i+1)*cellsize, (j+1)*cellsize); // i can't wrap my head around the logic right now to get the openings so ill just leave this here. forgive me
                 }
-                ctx.lineTo(5 + (i+1)*cellsize, 5 + (j+1)*cellsize);
+                ctx.lineTo((i+1)*cellsize, (j+1)*cellsize);
             } else {
-                ctx.moveTo(5 + (i+1)*cellsize, 5 + (j+1)*cellsize);
+                ctx.moveTo((i+1)*cellsize, (j+1)*cellsize);
             }
             // right wall
             if (mcells[i][j].right == true || j == mazerows-1) {
-                ctx.lineTo(5 + i*cellsize, 5 + (j+1)*cellsize);
+                ctx.lineTo(i*cellsize, (j+1)*cellsize);
             } else {
-                ctx.moveTo(5 + i*cellsize, 5 + (j+1)*cellsize);
+                ctx.moveTo(i*cellsize, (j+1)*cellsize);
             }
             // border walls
             if (i == 0 && j > 0) {
-                ctx.lineTo(5 + i*cellsize, 5 +  j*cellsize);
+                ctx.lineTo(i*cellsize,  j*cellsize);
             } else {
-                ctx.moveTo(5 + i*cellsize, 5 + j*cellsize);
+                ctx.moveTo(i*cellsize, j*cellsize);
             }
             if (j == 0) {
-                ctx.lineTo(5 + (i+1)*cellsize, 5 + j*cellsize);
+                ctx.lineTo((i+1)*cellsize, j*cellsize);
             } else {
-                ctx.moveTo(5 + (i+1)*cellsize, 5 + j*cellsize);
+                ctx.moveTo((i+1)*cellsize, j*cellsize);
             }
         }
     }
     
-    ctx.strokeStyle = "black"
     ctx.stroke();
     
     draw_path()
     
-    // center the maze onscreen
-    document.getElementById("mazeCanvas").style.position = "relative";
-    document.getElementById("mazeCanvas").style.left = "50%";
-    document.getElementById("mazeCanvas").style.right = "50%";
-    document.getElementById("mazeCanvas").style.transform = "translate(-50%, 0)"
 }
 
 // Draw the path from target to start cell as stored in mcells[][]
@@ -138,18 +136,18 @@ function draw_path() {
     let plen = 0;
     if (drawpath) {
         ctx.beginPath()
-        ctx.moveTo(cv.width, 5 + c[1]*cellsize + (cellsize/2))
-        ctx.lineTo(5 + (c[0]*cellsize) + (cellsize/2), 5 + c[1]*cellsize + (cellsize/2))
+        ctx.moveTo(cv.width, c[1]*cellsize + (cellsize/2))
+        ctx.lineTo((c[0]*cellsize) + (cellsize/2), c[1]*cellsize + (cellsize/2))
     }
     do {
         plen++;
         c = mcells[c[0]][c[1]].prev
         if (drawpath) {
-            ctx.lineTo(5 + (c[0]*cellsize) + (cellsize/2), 5 + c[1]*cellsize + (cellsize/2))
+            ctx.lineTo((c[0]*cellsize) + (cellsize/2), c[1]*cellsize + (cellsize/2))
         }
     } while (!(c[0] == 0 && c[1] == 0))
     if (drawpath) {
-        ctx.lineTo(0, 5 + c[1]*cellsize + (cellsize/2))
+        ctx.lineTo(0, c[1]*cellsize + (cellsize/2))
         ctx.strokeStyle = "red"
         ctx.stroke()
     }

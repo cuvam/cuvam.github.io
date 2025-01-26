@@ -1,27 +1,38 @@
 <!DOCTYPE html>
 <link rel="stylesheet" href="style.css">
+<script>
+function download() { // from https://stackoverflow.com/a/43000755 as well as html code for download button
+    var download = document.getElementById("download");
+    var image = document.getElementById("mazeCanvas").toDataURL("image/png")
+                .replace("image/png", "image/octet-stream");
+    download.setAttribute("href", image);
+}
+</script>
 <head>
     <title>Maze Generator</title>
 </head>
 <body>
-    <canvas id="mazeCanvas"></canvas>
     <div id="controls">
-        <button id="mazegenerate" onclick="genmaze()"> Generate </button>
-        <div class="numinput">
-            <input type="number" id="mazeinputrows" min="2" max="100" value="10">
+        <div>
+            <input type="number" id="mazeinputrows" min="2" max="500" value="10">
             <label for="mazeinputrows">Rows</label> 
- 
         </div>
-        <div class="numinput">
-            <input type="number" id="mazeinputcols" min="2" max="100" value="10">  
+        <div>
+            <input type="number" id="mazeinputcols" min="2" max="500" value="10">  
             <label for="mazeinputcols">Columns</label> 
         </div>
+        
+        <button id="mazegenerate" onclick="genmaze()">Generate</button>
+    </div>
+    <canvas id="mazeCanvas"></canvas>
+    <a id="download" download="image.png"><button style="margin-left:5px;" type="button" onClick="download()">Download as .png</button></a>
+    <hr>
+    <div>
         <input type="checkbox" id="mazeshowpath" onchange="drawmaze()">
         <label for="mazeshowpath">Draw Path</label><br>
     </div>
-    <hr>
     <div id="stats">
-        <h2 id="mazestatspathlength"></h2>
+        <p id="mazestatspathlength"></p>
     </div>
 </body>
-<script src="gen.js"> </script>
+<script src="gen.js"></script>
