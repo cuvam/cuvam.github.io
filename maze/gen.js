@@ -6,7 +6,6 @@ var mazecols = 10;
 var mazerows = 10;
 var cellsize = 30; // in pixels
 var drawpath = false;
-var paramsupdated = false;
 
 var mcells; // cell array
 
@@ -14,8 +13,9 @@ genmaze()
 
 // Generate a new maze based on input parameters 
 function genmaze() {
-    mazecols = Math.max(2, document.getElementById("mazeinputcols").value);
-    mazerows = Math.max(2, document.getElementById("mazeinputrows").value);
+    mazecols = document.getElementById("mazeinputcols").value
+    mazerows = document.getElementById("mazeinputrows").value
+    cellsize = document.getElementById("mazeinputcellsize").value; 
     // reinitialize cell array based on parameters
     mcells = Array();
     for (let i = 0; i < mazecols; i++) {
@@ -76,7 +76,6 @@ function genmaze() {
 // Draw maze as stored in mcells[][]
 function drawmaze() {
 
-    drawpath = document.getElementById("mazeshowpath").checked;
     cv.width = mazecols*cellsize + 10
     cv.height = mazerows*cellsize + 10
         
@@ -95,10 +94,7 @@ function drawmaze() {
         for (let j = 0; j < mazerows; j++) {
             ctx.moveTo((i+1)*cellsize, j*cellsize);
             // bottom wall
-            if ((mcells[i][j].bottom == true || i == mazecols-1)) {
-                if (i == mazecols-1 && j == mazerows-1) {
-                    ctx.moveTo((i+1)*cellsize, (j+1)*cellsize); // i can't wrap my head around the logic right now to get the openings so ill just leave this here. forgive me
-                }
+            if ((mcells[i][j].bottom == true || i == mazecols-1) && !(i == mazecols-1 && j == mazerows-1)) {
                 ctx.lineTo((i+1)*cellsize, (j+1)*cellsize);
             } else {
                 ctx.moveTo((i+1)*cellsize, (j+1)*cellsize);
@@ -127,6 +123,17 @@ function drawmaze() {
     
     draw_path()
     
+}
+
+function togglepath() {
+    if (drawpath == true) {
+        drawpath = false;
+        document.getElementById("mazeshowpath").innerText = "Show Path"
+    } else {
+        drawpath = true;
+        document.getElementById("mazeshowpath").innerText = "Hide Path"
+    }
+    drawmaze()
 }
 
 // Draw the path from target to start cell as stored in mcells[][]
