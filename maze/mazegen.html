@@ -8,11 +8,9 @@
         download.setAttribute("href", image);
     }
 </script>
-
 <head>
     <title>Maze Generator</title>
 </head>
-
 <body>
     <div id="controls">
         <div>
@@ -44,6 +42,8 @@
     <canvas id="mazeCanvas"></canvas>
     <a id="download" download="image.png"><button style="margin-left:5px;" type="button" onClick="download()">Download as .png</button></a>
     <button id="mazeshowpath" onclick="togglepath()">Show Path</button>
-    <label for="mazeshowpath" id="mazestatspathlength"></p>
+    <label for="mazeshowpath" id="mazestatspathlength"></label>
+    <textarea id="mazetextoutput" rows="4" cols="50" readonly></textarea>
+    <label for="mazetextoutput"></label>
 </body>
 <script src="gen.js"></script>

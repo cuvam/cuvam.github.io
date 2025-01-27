@@ -37,6 +37,7 @@ function genmaze() {
     } else {
         document.getElementById("mazeshowpath").disabled = "disabled"
     }
+    textoutput()
 }
 
 function genmazeRB() {
@@ -283,4 +284,31 @@ function draw_path() {
     } else {
         document.getElementById("mazestatspathlength").innerText = "";
     }
+}
+
+function textoutput() {
+    // Allows the user to copy a string of text that encodes the walls of the maze
+    let os = ""
+    /* 
+        May change this scheme but for now we will simply output the entire mcells array, where each cell
+        gets output as a single number 0-3 where:
+            0: no bottom wall or right wall
+            1: bottom wall, no right wall
+            2: right wall, no bottom wall
+            3: bottom wall and right wall
+    */
+    for (let i = 0; i < mazecols; i++) {
+        for (let j = 0; j < mazerows; j++) {
+            let cell = mcells[i][j]
+            let num = 0
+            if (cell.right && i < mazecols-1)
+                num += 1
+            if (cell.bottom && j < mazerows-1)
+                num += 2
+            os = os + num
+        }
+        if (i < mazecols-1)
+            os = os + '|'
+    }
+    document.getElementById("mazetextoutput").innerText = os
 }
