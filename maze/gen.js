@@ -4,18 +4,43 @@ const ctx = cv.getContext("2d");
 // parameters
 var mazecols = 10;
 var mazerows = 10;
-var cellsize = 30; // in pixels
+var cellsize = 30; // in pixels (not exactly accurate because of line stroke size)
 var drawpath = false;
+
+/* Some algo's have a "path" you can easily extract from the finished data structure (RB), 
+   some do not (LERW), and would require me to apply a pathfinding algorithm after generation 
+   to find a path. I may implement that in the future, but for now, we'll just keep track of
+   whether an algo can easily produce a solution path and disable the button as needed */
+var candrawpath = true 
 
 var mcells; // cell array
 
 genmaze()
 
-// Generate a new maze based on input parameters 
 function genmaze() {
+    // Generate a new maze based on input parameters using selected algorithm
     mazecols = document.getElementById("mazeinputcols").value
     mazerows = document.getElementById("mazeinputrows").value
     cellsize = document.getElementById("mazeinputcellsize").value; 
+    if (document.getElementById("mazeinputalgoRB").checked) {
+        candrawpath = true
+        genmazeRB()
+    } else if (document.getElementById("mazeinputalgoLERW").checked) {
+        candrawpath = false
+        genmazeLERW()
+    } else {
+        candrawpath = true
+        genmazeRB() // rb as default
+    }
+    if (candrawpath) {
+        document.getElementById("mazeshowpath").removeAttribute("disabled")
+    } else {
+        document.getElementById("mazeshowpath").disabled = "disabled"
+    }
+}
+
+function genmazeRB() {
+    // https://en.wikipedia.org/wiki/Maze_generation_algorithm#Randomized_depth-first_search
     // reinitialize cell array based on parameters
     mcells = Array();
     for (let i = 0; i < mazecols; i++) {
@@ -73,8 +98,103 @@ function genmaze() {
     drawmaze()
 }
 
-// Draw maze as stored in mcells[][]
+function genmazeLERW() {
+    // https://en.wikipedia.org/wiki/Maze_generation_algorithm#Wilson%27s_algorithm
+    // reinitialize cell array based on parameters
+    mcells = Array();
+    for (let i = 0; i < mazecols; i++) {
+        let row = Array();
+        for (let j = 0; j < mazerows; j++) {
+            row.push({"bottom": true, "right": true, "in_maze": false});
+        }
+        mcells.push(row);
+    }
+
+    // pick 1 random cell to start the maze
+    mcells[Math.floor(Math.random() * mazecols)][Math.floor(Math.random() * mazerows)].in_maze = true;
+
+    while (true) { // actual condition is below
+        /* The algorithm technically doesn't require the starting cell for each random walk to be randomized, 
+           so for simplicity we will just iterate over mcells each new walk to find an unincorporated cell
+           and only break the main loop if one is not found (meaning all cells have been added to the maze). */
+        let pick;
+        let UIfound = false
+        for (let i = 0; i < mazecols && !UIfound; i++) {
+            for (let j = 0; j < mazerows && !UIfound; j++) {
+                if (mcells[i][j].in_maze == false) {
+                    pick = [i, j]
+                    UIfound = true
+                }
+            }
+        }
+        if (!UIfound) 
+            break; // maze complete
+
+        // begin loop-erased random walk
+        let path = Array(pick)
+        let connected = false
+        while (!connected) {
+            // pick a random direction
+            cur = path[path.length-1]
+            let ns = Array()
+            if (cur[0] < mazecols-1)
+                ns.push([cur[0]+1, cur[1]])
+            if (cur[0] > 0)
+                ns.push([cur[0]-1, cur[1]])
+            if (cur[1] < mazerows-1)
+                ns.push([cur[0], cur[1]+1])
+            if (cur[1] > 0)
+                ns.push([cur[0], cur[1]-1])
+            let rn = ns[Math.floor(Math.random() * ns.length)] // random neighbor
+            let pind = findinpath(path, rn)
+            if (pind > -1) {
+                //console.log("Loop  detected") // Uncomment to see how inefficient my implementation is (hundreds of loop eliminations before the first random walk completes). I'm leaving it to remind myself to optimize it
+                path = path.slice(0, pind+1)
+            } else if (mcells[rn[0]][rn[1]].in_maze == true) {
+                //console.log("Connected to maze")
+                path.push(rn)
+                connected = true
+            } else {
+                path.push(rn)
+            }
+        }
+        //console.log("Completed walk size " + path.length)
+        //console.log(path)
+        // carve out walls to make path and mark them as incorporated
+        for (i = 0; i < path.length-1; i++) {
+            cur = path[i]
+            mcells[cur[0]][cur[1]].in_maze = true
+            next = path[i+1]
+            if (next[0] > cur[0]) {
+                mcells[cur[0]][cur[1]].bottom = false
+            } else if (next[0] < cur[0]) {
+                mcells[next[0]][next[1]].bottom = false
+            }  else if (next[1] > cur[1]) {
+                mcells[cur[0]][cur[1]].right = false
+            } else {
+                mcells[next[0]][next[1]].right = false
+            }
+            //console.log(cur, next) tunneling from cur  to next
+        }
+        
+    }
+
+    drawmaze()
+
+}
+
+function findinpath(path, cell) {
+    // turns out "Array.includes()" or indexOf or anything similar doesn't actually check if the data are the same
+    // i guess each Array(2) counts as an object which is what it instead looks for :\
+    for (i = 0; i < path.length; i++) {
+        if (path[i][0] == cell[0] && path[i][1] == cell[1])
+            return i
+    }
+    return -1
+}
+
 function drawmaze() {
+    // Draw maze as stored in mcells[][]
 
     cv.width = mazecols*cellsize + 10
     cv.height = mazerows*cellsize + 10
@@ -136,28 +256,31 @@ function togglepath() {
     drawmaze()
 }
 
-// Draw the path from target to start cell as stored in mcells[][]
 function draw_path() {
-    // assuming the target is always the bottom right corner for now
-    let c = [mazecols-1, mazerows-1];
-    let plen = 0;
-    if (drawpath) {
-        ctx.beginPath()
-        ctx.moveTo(cv.width, c[1]*cellsize + (cellsize/2))
-        ctx.lineTo((c[0]*cellsize) + (cellsize/2), c[1]*cellsize + (cellsize/2))
-    }
-    do {
-        plen++;
-        c = mcells[c[0]][c[1]].prev
+    // Draw the path from target to start cell as stored in mcells[][]
+    if (candrawpath) {
+        // assuming the target is always the bottom right corner for now
+        let c = [mazecols-1, mazerows-1];
+        let plen = 0;
         if (drawpath) {
+            ctx.beginPath()
+            ctx.moveTo(cv.width, c[1]*cellsize + (cellsize/2))
             ctx.lineTo((c[0]*cellsize) + (cellsize/2), c[1]*cellsize + (cellsize/2))
         }
-    } while (!(c[0] == 0 && c[1] == 0))
-    if (drawpath) {
-        ctx.lineTo(0, c[1]*cellsize + (cellsize/2))
-        ctx.strokeStyle = "red"
-        ctx.stroke()
+        do {
+            plen++;
+            c = mcells[c[0]][c[1]].prev
+            if (drawpath) {
+                ctx.lineTo((c[0]*cellsize) + (cellsize/2), c[1]*cellsize + (cellsize/2))
+            }
+        } while (!(c[0] == 0 && c[1] == 0))
+        if (drawpath) {
+            ctx.lineTo(0, c[1]*cellsize + (cellsize/2))
+            ctx.strokeStyle = "red"
+            ctx.stroke()
+        }
+        document.getElementById("mazestatspathlength").innerText = "Path length: " + plen;
+    } else {
+        document.getElementById("mazestatspathlength").innerText = "";
     }
-    
-    document.getElementById("mazestatspathlength").innerText = "Path length: " + plen;
 }

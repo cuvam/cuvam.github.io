@@ -16,22 +16,33 @@
 <body>
     <div id="controls">
         <div>
-            <input type="number" id="mazeinputrows" min="2" max="500" value="10">
-            <label for="mazeinputrows">Rows</label>
+            <div>
+                <input type="number" id="mazeinputrows" min="2" max="500" value="10">
+                <label for="mazeinputrows">Rows</label>
+            </div>
+            <div>
+                <input type="number" id="mazeinputcols" min="2" max="500" value="10">
+                <label for="mazeinputcols">Columns</label>
+            </div>
+            <div>
+                <input type="number" id="mazeinputcellsize" min="4" max="100" value="25">
+                <label for="mazeinputcellsize">Cell Size (px)</label>
+            </div>
         </div>
-        <div>
-            <input type="number" id="mazeinputcols" min="2" max="500" value="10">
-            <label for="mazeinputcols">Columns</label>
-        </div>
-        <div>
-            <input type="number" id="mazeinputcellsize" min="4" max="100" value="25">
-            <label for="mazeinputcellsize">Cell Size (px)</label>
+        <div id="genalgo">
+            <div>
+                <input type="radio" id="mazeinputalgoRB" name="genalgo" value="HTML" checked="checked">
+                <label for="mazeinputalgoRB">Recursive Backtracking</label>
+            </div>
+            <div>
+                <input type="radio" id="mazeinputalgoLERW" name="genalgo" value="CSS">
+                <label for="mazeinputalgoLERW">Wilson's Algorithm (LERW)</label>
+            </div>
         </div>
         <button id="mazegenerate" onclick="genmaze()">Generate</button>
     </div>
     <canvas id="mazeCanvas"></canvas>
-    <a id="download" download="image.png"><button style="margin-left:5px;" type="button" onClick="download()">Download
-            as .png</button></a>
+    <a id="download" download="image.png"><button style="margin-left:5px;" type="button" onClick="download()">Download as .png</button></a>
     <button id="mazeshowpath" onclick="togglepath()">Show Path</button>
     <label for="mazeshowpath" id="mazestatspathlength"></p>
 </body>
