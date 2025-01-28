@@ -136,7 +136,7 @@ function genmazeLERW() {
         let connected = false
         while (!connected) {
             // pick a random direction
-            cur = path[path.length-1]
+            let cur = path[path.length-1]
             let ns = Array()
             if (cur[0] < mazecols-1)
                 ns.push([cur[0]+1, cur[1]])
@@ -162,10 +162,10 @@ function genmazeLERW() {
         //console.log("Completed walk size " + path.length)
         //console.log(path)
         // carve out walls to make path and mark them as incorporated
-        for (i = 0; i < path.length-1; i++) {
-            cur = path[i]
+        for (let i = 0; i < path.length-1; i++) {
+            let cur = path[i]
             mcells[cur[0]][cur[1]].in_maze = true
-            next = path[i+1]
+            let next = path[i+1]
             if (next[0] > cur[0]) {
                 mcells[cur[0]][cur[1]].bottom = false
             } else if (next[0] < cur[0]) {
@@ -187,7 +187,7 @@ function genmazeLERW() {
 function findinpath(path, cell) {
     // turns out "Array.includes()" or indexOf or anything similar doesn't actually check if the data are the same
     // i guess each Array(2) counts as an object which is what it instead looks for :\
-    for (i = 0; i < path.length; i++) {
+    for (let i = 0; i < path.length; i++) {
         if (path[i][0] == cell[0] && path[i][1] == cell[1])
             return i
     }
