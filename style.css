@@ -12,7 +12,18 @@ body {
     transform: translate(50%, 0);
 }
 
+header {
+    width: 50%;
+    transform: translate(50%, 0);
+    text-align: center;
+}
+
 footer {
     text-align: center;
     font-size: 75%;
+}
+
+p {
+    display: inline;
+    margin: 10px;
 }
