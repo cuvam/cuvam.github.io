@@ -16,7 +16,7 @@ var grid = Array()
 for (let y = 0; y < gridheight; y++) {
     let row = Array()
     for (let x = 0; x < gridwidth; x++)
-        row.push((x != 5 || y == 5) && (y != 9 || x == 15)) // whether cell is traversable
+        row.push((x != 5 || y == 5) && (y != 9 || x == 15)) // true= cell is traversable
     grid.push(row)
 }
 
@@ -25,13 +25,7 @@ draw()
 
 function path() {
     // very inefficient BFS implementation
-    let visited = Array()
-    for (let y = 0; y < gridheight; y++) {
-        let row = Array()
-        for (let x = 0; x < gridwidth; x++)
-            row.push(false)
-        visited.push(row)
-    }
+    let visited = new Map()
     let fringe = Array({x:0, y:0, len:0, prev:undefined})
     let found = false
     let last
@@ -40,20 +34,20 @@ function path() {
         let top
         do {
             top = fringe.pop()
-        } while (fringe.length > 0 && visited[top.y][top.x] == true)
+        } while (fringe.length > 0 && visited[[top.y, top.x]] == true)
         if (top.x == target[0] && top.y == target[1]) {
             found = true;
             last = top
             break;
         }
-        visited[top.y][top.x] = true
-        if (top.x > 0 && visited[top.y][top.x-1] == false && grid[top.y][top.x-1] == true)
+        visited[[top.y, top.x]] = true
+        if (top.x > 0 && visited[[top.y, top.x-1]] != true && grid[top.y][top.x-1] == true)
             fringe.push({x:top.x-1, y:top.y, len:top.len+1, prev:top})
-        if (top.x < gridwidth-1 && visited[top.y][top.x+1] == false && grid[top.y][top.x+1] == true)
+        if (top.x < gridwidth-1 && visited[[top.y, top.x+1]] != true && grid[top.y][top.x+1] == true)
             fringe.push({x:top.x+1, y:top.y, len:top.len+1, prev:top})
-        if (top.y > 0 && visited[top.y-1][top.x] == false && grid[top.y-1][top.x] == true)
+        if (top.y > 0 && visited[[top.y-1, top.x]] != true && grid[top.y-1][top.x] == true)
             fringe.push({x:top.x, y:top.y-1, len:top.len+1, prev:top})
-        if (top.y < gridheight-1 && visited[top.y+1][top.x] == false && grid[top.y+1][top.x] == true)
+        if (top.y < gridheight-1 && visited[[top.y+1, top.x]] != true && grid[top.y+1][top.x] == true)
             fringe.push({x:top.x, y:top.y+1, len:top.len+1, prev:top})
     }
     if (found) {
@@ -110,7 +104,6 @@ function drawsquare(canvas, event) {
     let rect = canvas.getBoundingClientRect();
     let x = event.clientX - rect.left;
     let y = event.clientY - rect.top;
-    lastchangedsquare = [x,y]
     grid[Math.floor(y/gridsquaresize)][Math.floor(x/gridsquaresize)] = (!grid[Math.floor(y/gridsquaresize)][Math.floor(x/gridsquaresize)])
     path()
     draw()
