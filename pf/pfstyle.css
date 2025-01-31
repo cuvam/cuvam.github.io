@@ -1,0 +1,12 @@
+body {
+    background-color:rgb(6, 64, 43)
+}
+
+canvas {
+    display: block;
+}
+
+label {
+    font-size: 24px;
+    color: white;
+}

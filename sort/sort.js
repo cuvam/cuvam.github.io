@@ -1,4 +1,3 @@
-//// @ts-check
 const cv = document.getElementById("displaylist")
 const ctx = cv.getContext("2d")
 
