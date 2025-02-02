@@ -4,13 +4,13 @@ const cv = document.querySelector("canvas");
 const ctx = cv.getContext("2d");
 
 var gridsquaresize = 30;
-var gridwidth = 30;
-var gridheight = 20;
+var gridwidth = 31;
+var gridheight = 21;
 
 cv.width = gridwidth * gridsquaresize;
 cv.height = gridheight * gridsquaresize;
 
-let target = [gridwidth - 1, gridheight - 1];
+let target = [gridheight - 1, gridwidth - 1];
 var spath = Array();
 var pathexists = true;
 
@@ -39,7 +39,7 @@ function path() {
         do {
             top = fringe.pop();
         } while (fringe.length > 0 && visited[[top.y, top.x]] == true);
-        if (top.x == target[0] && top.y == target[1]) {
+        if (top.y == target[0] && top.x == target[1]) {
             found = true;
             last = top;
             break;
@@ -102,9 +102,11 @@ function draw() {
         for (let x = 0; x < gridwidth; x++) {
             if (grid[y][x] == false) {
                 ctx.fillRect(x * gridsquaresize, y * gridsquaresize, gridsquaresize, gridsquaresize);
-            }}}
+            }
+        }
+    }
     ctx.fillStyle = "yellow";
-    ctx.fillRect(target[0] * gridsquaresize, target[1] * gridsquaresize, gridsquaresize, gridsquaresize);
+    ctx.fillRect(target[1] * gridsquaresize, target[0] * gridsquaresize, gridsquaresize, gridsquaresize);
     ctx.fillStyle = "green";
     ctx.fillRect(0, 0, gridsquaresize, gridsquaresize);
     if (spath.length > 0) {
@@ -126,16 +128,37 @@ function cleargrid() {
     for (let y = 0; y < gridheight; y++) {
         for (let x = 0; x < gridwidth; x++) {
             grid[y][x] = true;
-        }}
+        }
+    }
+    path();
+}
+
+function randomsquare() {
+    let maxattempts = 100;
+    let attempts = 0;
+    for (let n = 0; n < 5 && attempts < maxattempts; n++) {
+        let x, y;
+        do {
+            y = Math.floor(Math.random() * gridheight);
+            x = Math.floor(Math.random() * gridwidth);
+            attempts += 1;
+        } while (attempts < maxattempts && grid[y][x] !== true && x === target[1] && y === target[0]);
+        if (attempts < maxattempts) {
+            grid[y][x] = false;
+        }
+    }
+    if (attempts === maxattempts) {
+        console.log("Max attempt limit " + maxattempts + " reached for randomsquare()");
+    }
     path();
 }
 
 function drawsquare(canvas, event) {
     let rect = canvas.getBoundingClientRect();
-    let x = event.clientX - rect.left;
-    let y = event.clientY - rect.top;
-    if (!(x == target[0] && y == target[1])) {
-        grid[Math.floor(y / gridsquaresize)][Math.floor(x / gridsquaresize)] = !grid[Math.floor(y / gridsquaresize)][Math.floor(x / gridsquaresize)];
+    let x = Math.floor((event.clientX - rect.left) / gridsquaresize);
+    let y = Math.floor((event.clientY - rect.top) / gridsquaresize);
+    if (!(x === target[1] && y === target[0])) {
+        grid[y][x] = !grid[y][x];
     }
     path();
 }
