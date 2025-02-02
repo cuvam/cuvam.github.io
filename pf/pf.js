@@ -138,7 +138,7 @@ function cleargrid() {
 function randomsquare() {
     let maxattempts = 150;
     let attempts = 0;
-    for (let n = 0; n < 5 && attempts < maxattempts; n++) {
+    for (let n = 0; n < 15 && attempts < maxattempts; n++) {
         let x, y;
         do {
             y = Math.floor(Math.random() * gridheight);
