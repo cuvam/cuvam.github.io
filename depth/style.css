@@ -5,7 +5,6 @@
     border-color: rgba(0,0,0);
     background-color: rgba(150, 150, 150, 0.2);
     margin: 2px 1px 5px 5px;
-    cursor: pointer;
     overflow: hidden;
 }
 
@@ -14,4 +13,5 @@
     display: inline-block;
     margin: 5px;
     user-select: none;
+    cursor: pointer;
 }
