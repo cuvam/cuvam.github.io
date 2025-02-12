@@ -1,0 +1,39 @@
+body {
+    background: linear-gradient(to top, rgb(0, 0, 0), rgb(255, 255, 255));
+    background-attachment: fixed;
+    margin: 5px;
+    overflow: hidden;
+    height: 100%;
+}
+
+.main {
+    height: 500px;
+}
+
+.container {
+    display: flex;
+    flex-grow: 1;
+    padding: 0;
+    margin: 0;
+    border: 0px solid black;
+    overflow: auto;
+}
+
+.col {   
+    flex-flow: column;
+}
+
+.row {   
+    flex-flow: row;
+}
+
+.item {
+    flex-grow: 1;
+    border: 3px solid;
+    padding: 5px;
+    margin: 10px;    
+}
+
+#a {
+    border-color: rgb(255, 0, 0);
+}
