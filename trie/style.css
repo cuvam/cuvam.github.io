@@ -1,20 +1,32 @@
-#triecontrols {
+.triecontrols {
     margin: 10px;
+    font-family: system-ui;
 }
 
-#triecontainer div {
+#triecontainer {
+    border-style: solid;
+    border-width: 1px 1px 1px 1px;
+}
+
+.trienest {
+    display: block;
     margin-left: 0.5em;
     border-style: solid;
     border-width: 0px 0px 0px 1px;
 }
 
 p {
-    margin: 0px;
-    margin-left: 0.5em;
+    font-family: monospace;
     display: inline;
+    margin: 0px;
+    color: lightgray;
+    margin-left: inherit;
+    cursor: pointer;
+    user-select: none;
 }
 
 .word {
     margin-left: 1em;
     font-weight: bold;
+    color: black;
 }

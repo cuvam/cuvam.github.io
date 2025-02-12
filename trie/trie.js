@@ -1,30 +1,29 @@
-triehead = { "letter": undefined, "container": document.getElementById("triecontainer"), "word": undefined }
-for (let c = 0; c < 24; c++) {
+triehead = { "letter": undefined, "container": document.getElementById("triecontainer"), "word": undefined, "hidden": false }
+for (let c = 0; c < 26; c++) {
     triehead[String.fromCharCode(97 + c)] = undefined
 }
 
-const defaultwords = ["arcade", "arch", "architect", "architectural", "architecture", "archive", "archived", "archives", "arctic", "are", "area", "areas", "arena", "argentina", "argue", "argued", "argument", "arguments", "arise", "arising", "arizona", "arkansas", "arlington", "arm", "armed"]
-defaultwords.forEach(element => {
+let words = loadFile("words.txt").split("\n").slice(0, 30)
+words.forEach(element => {
     insertword(triehead, element)
-});
+})
 
 function branch(parent, le) {
     if (parent[le] !== undefined) {
         return parent[le]
     } else {
-        let nbc = document.createElement("div")
+        let nbc = document.createElement("span")
+        nbc.setAttribute("class", "trienest")
         let nb = { "letter": le, "container": nbc }
-        for (let c = 0; c < 24; c++) {
+        for (let c = 0; c < 26; c++) {
             nb[String.fromCharCode(97 + c)] = undefined
         }
         parent[le] = nb
         let nbt = document.createElement("p")
+        nbt.addEventListener("click", (e) => toggle(nb))
         let text = document.createTextNode(le)
         nbt.appendChild(text)
         nbc.appendChild(nbt)
-        for (let c = 0; c < 24; c++) {
-            nb[String.fromCharCode(97 + c)] = undefined
-        }
         let nextchild = undefined
         for (c = le.charCodeAt(0) - 96; c < 26; c++) {
             let tc = parent[String.fromCharCode(97 + c)]
@@ -49,11 +48,52 @@ function insertword(head, word) {
         nbw.setAttribute("class", "word")
         let text = document.createTextNode(word.join(""))
         nbw.appendChild(text)
-        l.container.appendChild(nbw)
+        l.container.querySelector("p").appendChild(nbw)
     }
 }
 
 function addword() {
     let word = document.getElementById("trieinput").value
     insertword(triehead, word)
+}
+
+function expand(branch) {
+    for (let c = 0; c < 26; c++) {
+        let cb = branch[String.fromCharCode(97 + c)]
+        if (cb !== undefined) {
+            cb.container.setAttribute("style", "display: block")
+            expand(cb)
+        }
+    }
+}
+
+function collapse(branch) {
+    for (let c = 0; c < 26; c++) {
+        let cb = branch[String.fromCharCode(97 + c)]
+        if (cb !== undefined) {
+            cb.container.setAttribute("style", "display: none")
+            collapse(cb)
+        }
+    }
+}
+
+function toggle(parent) {
+    if (parent.hidden) {
+        parent.hidden = false
+        expand(parent)
+    } else {
+        parent.hidden = true
+        collapse(parent)
+    }
+}
+
+function loadFile(filePath) {
+    var result = null;
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("GET", filePath, false);
+    xmlhttp.send();
+    if (xmlhttp.status==200) {
+        result = xmlhttp.responseText;
+    }
+    return result;
 }
