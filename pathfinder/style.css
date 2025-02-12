@@ -1,0 +1,18 @@
+body {
+    background-color: rgb(6, 20, 64);
+}
+
+canvas {
+    display: block;
+}
+
+button {
+    font-size: 125%;
+    margin: 5px;
+}
+
+label {
+    display: block;
+    font-size: 24px;
+    color: white;
+}
