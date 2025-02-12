@@ -1,0 +1,20 @@
+#triecontrols {
+    margin: 10px;
+}
+
+#triecontainer div {
+    margin-left: 0.5em;
+    border-style: solid;
+    border-width: 0px 0px 0px 1px;
+}
+
+p {
+    margin: 0px;
+    margin-left: 0.5em;
+    display: inline;
+}
+
+.word {
+    margin-left: 1em;
+    font-weight: bold;
+}
