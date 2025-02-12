@@ -3,7 +3,7 @@ for (let c = 0; c < 26; c++) {
     triehead[String.fromCharCode(97 + c)] = undefined
 }
 
-let words = loadFile("words.txt").split("\n").slice(0, 30)
+let words = loadFile("words.txt").split("\n")
 words.forEach(element => {
     insertword(triehead, element)
 })
@@ -33,22 +33,6 @@ function branch(parent, le) {
         }
         parent.container.insertBefore(nbc, nextchild) // insertBefore just appends the child if nextchild is undefined
         return nb
-    }
-}
-
-function insertword(head, word) {
-    word = word.toLowerCase().split('').filter(char => /[a-zA-Z]/.test(char))
-    var l = head
-    for (let i = 0; i < word.length; i++) {
-        l = branch(l, word[i])
-    }
-    if (l.word === undefined) {
-        l.word = word
-        let nbw = document.createElement("p")
-        nbw.setAttribute("class", "word")
-        let text = document.createTextNode(word.join(""))
-        nbw.appendChild(text)
-        l.container.querySelector("p").appendChild(nbw)
     }
 }
 
@@ -96,4 +80,36 @@ function loadFile(filePath) {
         result = xmlhttp.responseText;
     }
     return result;
+}
+
+function insertword(head, word) {
+    word.toLowerCase().split(' ').forEach(word => {
+        word = word.split('').filter(char => /[a-zA-Z]/.test(char))
+        var l = head
+        for (let i = 0; i < word.length; i++) {
+            l = branch(l, word[i])
+        }
+        if (l.word === undefined) {
+            l.word = word
+            let nbw = document.createElement("p")
+            nbw.setAttribute("class", "word")
+            let text = document.createTextNode(word.join(""))
+            nbw.appendChild(text)
+            l.container.querySelector("p").appendChild(nbw)
+        }
+    });
+}
+
+function cleartrie() {
+    erasechildren(triehead)
+    triehead = { "letter": undefined, "container": document.getElementById("triecontainer"), "word": undefined, "hidden": false }
+}
+
+function erasechildren(trie) {
+    for (let c = 0; c < 26; c++) {
+        if (trie[String.fromCharCode(97 + c)] !== undefined) {
+            erasechildren(trie[String.fromCharCode(97 + c)])
+            trie[String.fromCharCode(97 + c)].container.remove()
+        }
+    }
 }

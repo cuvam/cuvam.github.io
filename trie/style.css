@@ -12,7 +12,7 @@
     display: block;
     margin-left: 0.5em;
     border-style: solid;
-    border-width: 0px 0px 0px 1px;
+    border-width: 0px 0px 0px 0.5px;
 }
 
 p {
