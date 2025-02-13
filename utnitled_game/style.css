@@ -4,12 +4,20 @@ body {
     margin: 5px;
     overflow: hidden;
     height: 100%;
+    text-align: center;
+}
+
+h2, p {
+    display: inline;
+    margin: 0px;
 }
 
 .txt {
-    font-weight: bold;
     font-family: monospace;
 }
+
+
+/* Containers */
 
 .container {
     display: flex;
@@ -18,6 +26,12 @@ body {
     margin: 0;
     border: 0px solid black;
     overflow: auto;
+}
+
+.subcontainer {
+    margin: 5px;
+    padding: 5px;
+    border: 2px inset;
 }
 
 .col {   
@@ -32,9 +46,30 @@ body {
     flex-grow: 1;
     border: 2px solid;  
     padding: 5px;
+    border-color: black(255, 0, 0);
     margin: 10px;    
 }
 
-#a {
-    border-color: black(255, 0, 0);
+/* Animations */
+
+.prog {
+    margin: 5px;
+    height: 20px;
+    background-color: white;
+    border: 2px solid black;
+}
+
+.prog > span {
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    transition-duration: 1s;
+    transition-property: all;
+    transition-timing-function: linear;
+    background-image: linear-gradient(to left, rgb(117, 117, 255), blue);
+    width: 0%;
+}
+
+.prog > span.a {
+    width: 100%;
 }

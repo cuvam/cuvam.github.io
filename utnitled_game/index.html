@@ -6,23 +6,13 @@
 <body>
     <div class="main container row">
         <div class="container col">
-            <div id="a" class="item">
-                <div id="a" class="item">
-                    <button class="txt" onclick="startfight()">Fight</button>
-                </div>
-                <div id="a" class="item">
-                    
+            <div id="stats" class="item">
+                <h2 class="txt">Robots: <p class="txt" id="stat_numrobots">0</p></h2>
+                <div class="subcontainer">
+                    <button class="txt" onclick="buildrobot()">Build Robot</button>
+                    <div class="prog"><span id="pb_buildrobot"></span></div>
                 </div>
             </div>
-        </div>
-        <div class="container col">
-            <div id="a" class="item"></div>
-            <div id="a" class="item"></div>
-        </div>
-        <div class="container col">
-            <div id="a" class="item"></div>
-            <div id="a" class="item"></div>
-            <div id="a" class="item"></div>
         </div>
     </div>
     <script src="game.js"></script>
