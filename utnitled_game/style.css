@@ -6,8 +6,9 @@ body {
     height: 100%;
 }
 
-.main {
-    height: 500px;
+.txt {
+    font-weight: bold;
+    font-family: monospace;
 }
 
 .container {
@@ -29,11 +30,11 @@ body {
 
 .item {
     flex-grow: 1;
-    border: 3px solid;
+    border: 2px solid;  
     padding: 5px;
     margin: 10px;    
 }
 
 #a {
-    border-color: rgb(255, 0, 0);
+    border-color: black(255, 0, 0);
 }
