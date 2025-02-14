@@ -6,6 +6,10 @@ body {
     margin: 5px;
 }
 
+a {
+    font-size: 125%;
+}
+
 .cs-tabs {
     margin: 10px;
     width: 50%;
