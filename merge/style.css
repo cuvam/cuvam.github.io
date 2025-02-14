@@ -1,5 +1,10 @@
 body {
     background-color:lightcyan;
+    font-size: 24px;
+}
+
+button {
+    font-size: 24px;
 }
 
 .flexcontainer {
@@ -17,12 +22,12 @@ body {
     cursor: pointer;
     height: 7%;
     width: 5em;
-    border: 2px solid black;  
+    border: 3px solid black;  
     padding: 5px;
     background-color: white;
     margin: 10px;    
 }
 
 .selected {
-    border: 2px solid blue;
+    border: 3px solid blue;
 }
