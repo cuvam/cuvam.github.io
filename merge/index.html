@@ -7,8 +7,11 @@
 </head>
 <body>
     <button onclick="addbox()">add box</button>
-    <button id="attemptmergebtn" onclick="attemptmerge()">attempt a merge</button>
     <button id="toggleautomergebtn" onclick="toggleautomerging()">enable automerge</button>
+    <span id="automergeaddboxescontainer" style="visibility: hidden;">
+        <input type="checkbox" onchange="toggleautomergeaddboxes()" id="automergeaddboxescb"> 
+        <label for="automergeaddboxescb">auto-add boxes</label>
+    </span>
     <div class="flexcontainer">
     </div>
     <script src="merge.js"></script>

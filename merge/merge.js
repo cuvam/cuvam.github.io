@@ -1,19 +1,22 @@
 let boxes = []
 let selectedbox = undefined
-let midmerge = false
 let automerging = false
+let automergecanaddboxes = false // whether automerge can add a box if it can't find any more merges
 let nomergesavailable = true // so the automerge doesn't constantly attempt to merge even if it won't succeed 
 
 const automergedelay = 500 // ms
 
-for (let i = 1; i < 5; i++) {
-    for (let j = 0; j < 3; j++) {
-        addbox(i)
-    }
-}
+addbox();addbox();addbox();addbox();
+
+/* start automerge automatically */
+document.getElementById("automergeaddboxescb").setAttribute("checked", "")
+toggleautomergeaddboxes()
+toggleautomerging()
+/* start automerge automatically */
+
 
 function addbox(lvl=1) {
-    if (boxes.length >= 32) { // cap on # of boxes
+    if (boxes.length >= 64) { // cap on # of boxes
         return
     }
     nomergesavailable = false // adding another box could introduce an opportunity to merge
@@ -24,7 +27,8 @@ function addbox(lvl=1) {
         "level": lvl, 
         "element": newboxdiv
     }
-    newboxdiv.setAttribute("class", "flexitem")
+    newboxdiv.setAttribute("class", "flexitem new")
+    setTimeout(() => { newboxdiv.setAttribute("class", "flexitem") }, automergedelay*0.5)
     newboxdiv.style.backgroundColor = `rgb(255, 255, ${(255 - ((newbox.level-1)*10))})`
     newboxdiv.addEventListener("click", (e) => mergebox(newbox))
     boxes.push(newbox)
@@ -47,10 +51,15 @@ function mergebox(box) {
     } else {
         if (selectedbox.level === box.level && selectedbox != box) {
             box.level += 1
+            box.element.setAttribute("class", "flexitem merged")
             box.element.querySelector("p").innerText = box.level
             box.element.style.backgroundColor = `rgb(255, 255, ${(255 - (box.level*10))})`
             boxes.splice(boxes.indexOf(selectedbox), 1)
-            selectedbox.element.remove()
+            let tbr = selectedbox
+            setTimeout(() => {
+                box.element.setAttribute("class", "flexitem")
+            }, automergedelay*0.5)
+            tbr.element.remove()
             selectedbox = undefined
         } else {
             console.log("select two different boxes of same level")
@@ -66,32 +75,26 @@ function sortboxes() {
 }
 
 function attemptmerge() {
-    if (midmerge) {
-        //console.log("WAIT bruh!!")
-        return 
-    }
-    midmerge = true
-    for (let i = 0; i < boxes.length-2; i++) {
+    for (let i = 0; i < boxes.length-1; i++) {
         let tb = boxes[i]
-        for (let j = i+1; j < boxes.length-1; j++) {
+        for (let j = i+1; j < boxes.length; j++) {
             let nb = boxes[j]
             if (tb.level === nb.level) {
-                tb.element.setAttribute("class", "flexitem selected")
                 nb.element.setAttribute("class", "flexitem selected")
-                selectedbox = tb
-                setTimeout(() => {
-                    mergebox(nb)
-                    nb.element.setAttribute("class", "flexitem")
-                    midmerge = false
-                }, automergedelay)
+                tb.element.setAttribute("class", "flexitem selected")
+                selectedbox = nb
+                mergebox(tb)
+                selectedbox = undefined;
                 return 
             }
         }        
     }
-    console.log("no more merges available")
-    nomergesavailable = true
-    midmerge = false
-    return 
+    if (automergecanaddboxes) {
+        addbox()
+    } else {
+        console.log("no more merges available, check 'auto-add boxes' to allow automerge to add more boxes")
+        nomergesavailable = true
+    }
 }
 
 function automergeloop() {
@@ -106,12 +109,17 @@ function automergeloop() {
 function toggleautomerging() {
     if (automerging) {
         automerging = false
-        document.getElementById("attemptmergebtn").disabled = false
+        document.getElementById("automergeaddboxescontainer").style.visibility = "hidden"
         document.getElementById("toggleautomergebtn").innerText = "enable automerge"
     } else {
         automerging = true
-        document.getElementById("attemptmergebtn").disabled = true
+        document.getElementById("automergeaddboxescontainer").style.visibility = "visible"
         document.getElementById("toggleautomergebtn").innerText = "disable automerge"
         automergeloop()
     }
+}
+
+function toggleautomergeaddboxes() {
+    automergecanaddboxes = document.getElementById("automergeaddboxescb").checked
+    nomergesavailable = false
 }
