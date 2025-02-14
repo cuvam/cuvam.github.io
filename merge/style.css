@@ -1,0 +1,28 @@
+body {
+    background-color:lightcyan;
+}
+
+.flexcontainer {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    flex-flow: row wrap;
+    border: 0px solid black;
+    overflow: auto;
+}
+
+.flexitem {
+    user-select: none;
+    text-align: center;
+    cursor: pointer;
+    height: 7%;
+    width: 5em;
+    border: 2px solid black;  
+    padding: 5px;
+    background-color: white;
+    margin: 10px;    
+}
+
+.selected {
+    border: 2px solid blue;
+}
