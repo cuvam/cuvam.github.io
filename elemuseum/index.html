@@ -18,6 +18,42 @@
     </div>
     <div class="item">
         <h2>
+            <code>&lt;input&gt;</code>
+        </h2>
+        <p>
+            The <code>&lt;input&gt;</code> HTML element is used to create interactive controls for web-based forms in order to accept data from the user; a wide variety of types of input data and control widgets are available, depending on the device and user agent. <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">MDN Web Docs</a>
+        </p>
+        <div class="flexcontainer">
+            <div class="flexitem noselect">
+                <fieldset>
+                    <legend><code>&lt;input type="radio"&gt;</code></legend>
+                    <div>
+                        <input type="radio" id="beige" name="bgcolor" value="beige" checked onchange="bgc_beige()">
+                        <label for="beige">Beige</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="grey" name="bgcolor" value="grey" onchange="bgc_grey()">
+                        <label for="grey">Grey</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="skyblue" name="bgcolor" value="skyblue" onchange="bgc_skyblue()">
+                        <label for="skyblue">Sky Blue</label>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="flexitem noselect">
+                <fieldset>
+                    <legend><code>&lt;input type="range"&gt;</code></legend>
+                    <div style="margin:1em;">
+                        <input type="range" onchange="bgb_update(false)" id="bgbrightness" name="bgbrightness" min="0" max="100" value="100">
+                        <label for="bgbrightness">Brightness</label>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="item">
+        <h2>
             <code>&lt;meter&gt;</code>
         </h2>
         <p>
@@ -40,6 +76,15 @@
     </div>
 </body>
 <script>
+    let bgc = "beige"
+    let bgb = 100 
+    let updatingbgb = false
+
+    function bgchange(color, brightness) {
+        document.querySelector("body").style.background = `color-mix(in srgb, ${color} ${brightness}%, black)`
+    }
+
+    // meter
     let meter = document.getElementById("examplemeter")
     metervalue = 0
     setInterval(() => {
@@ -51,5 +96,43 @@
         }
         meter.value = metervalue
     }, 100)
+
+    // input[type="radio"]
+    function bgc_beige() {
+        bgc = "beige"
+        bgchange(bgc, bgb)
+    }
+
+    function bgc_grey() {
+        bgc = "gray"
+        bgchange(bgc, bgb)
+    }
+
+    function bgc_skyblue() {
+        bgc = "skyblue"
+        bgchange(bgc, bgb)
+    }
+
+    // input[type="range"]
+    // Updating the background is done every 50ms while the slider is hovered over by the mouse, so it updates as the user slides it and not just after they release it
+    function bgb_update(loop=true) {
+        bgbs = document.getElementById("bgbrightness")
+        if (bgb !== bgbs.value) {
+            bgb = bgbs.value
+            bgchange(bgc, bgb)
+        }
+        if (updatingbgb && loop) {
+            setTimeout(bgb_update, 50)
+        }
+    }
+
+    document.getElementById("bgbrightness").addEventListener("mouseover", () => {
+        updatingbgb = true
+        bgb_update()
+    })
+
+    document.getElementById("bgbrightness").addEventListener("mouseout", () => {
+        updatingbgb = false
+    })
 </script>
 </html>

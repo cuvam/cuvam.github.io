@@ -1,5 +1,5 @@
 body {
-    background-color:beige;
+    background: color-mix(in srgb, beige 100%, black);
     min-width: 550px;
     max-width: 750px;
     width: 70%;
@@ -8,6 +8,19 @@ body {
 
 .examplecontainer {
     text-align: center;
+}
+
+.flexcontainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: stretch;
+    padding: 10px;
+    gap: 7px;
+}
+
+.flexitem {
+    flex-grow: 1;
 }
 
 .item {
@@ -42,4 +55,23 @@ meter {
 
 textarea {
     margin: 10px auto 5px auto;
+}
+
+fieldset {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
+
+label {
+    display: inline-block;
+}
+
+.noselect {
+    user-select: none;
+}
+
+legend {
+    user-select: text;
+    font-size: 14px;
 }
