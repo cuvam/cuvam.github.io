@@ -7,7 +7,15 @@ body {
 }
 
 a {
+    font-weight: bold;
+}
+
+button > a {
     font-size: 125%;
+}
+
+.panelsection {
+    margin: 10px;
 }
 
 .cs-tabs {
