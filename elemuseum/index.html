@@ -1,26 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- For some reason '&lt;' and '&gt;' correctly aren't used as tag markers by the HTML renderer, but only when I preview
+         the webpage; but when uploading to GitHub pages I suppose there's another layer of parsing that makes the final HTML page
+         interperet them as tags on some browsers which obviously breaks the page. As a workaround I will just use unicode characters '<' (U+FF1E)
+         and '＞' (U+FF1C) which are visually almost identical to the standard '<' and '>' characters. -->
     <div class="item">
         <h2>
-            <code>&lt;blockquote&gt;</code>
+            <code>＜blockquote＞</code>
         </h2>
         <p>
-            The <code>&lt;blockquote&gt;</code> HTML element indicates that the enclosed text is an extended quotation. Usually, this is rendered visually by indentation. A URL for the source of the quotation may be given using the cite attribute, while a text representation of the source can be given using the <code>&lt;cite&gt;</code> element. <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/abbr">MDN Web Docs</a>
+            The <code>＜blockquote＞</code> HTML element indicates that the enclosed text is an extended quotation. Usually, this is rendered visually by indentation. A URL for the source of the quotation may be given using the cite attribute, while a text representation of the source can be given using the <code>＜cite＞</code> element. <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/blockquote">MDN Web Docs</a>
         </p>
         <blockquote style="border: 1px solid lightgray;">
-            This is an example of a <code>&lt;blockquote&gt;</code> element. The default blockquote styling does not have a border; the border around this one has been added to show the bounds of the element. 
+            This is an example of a <code>＜blockquote＞</code> element. The default blockquote styling does not have a border; the border around this one has been added to show the bounds of the element. 
         </blockquote>
     </div>
     <div class="item">
         <h2>
-            <code>&lt;meter&gt;</code>
+            <code>＜meter＞</code>
         </h2>
         <p>
-            The <code>&lt;meter&gt;</code> HTML element represents either a scalar value within a known range or a fractional value. <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meter">MDN Web Docs</a>
+            The <code>＜meter＞</code> HTML element represents either a scalar value within a known range or a fractional value. <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meter">MDN Web Docs</a>
         </p>
         <div class="examplecontainer">
             <meter id="examplemeter" min="0" max="100"></meter>
