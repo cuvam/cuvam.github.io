@@ -15,6 +15,7 @@ body {
     border: 2px outset;
     padding: 0.7em;
     margin: 1em;
+    overflow: auto;
 }
 
 code {
@@ -37,4 +38,8 @@ p {
 meter {
     margin: 10px auto 5px auto;
     width: 50%;
+}
+
+textarea {
+    margin: 10px auto 5px auto;
 }
