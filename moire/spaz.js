@@ -77,17 +77,19 @@ function playanimation() {
     if (!playing) {
         playing = true
         document.getElementById("playbutton").innerText = "Stop"
+        document.getElementById("follow_mouse").setAttribute("disabled", "d")
         let dur = params.slide_duration.value
         bg.style.animation = `${dur}s 1 linear slide`
         animationTimer = setTimeout(() => {
             playing = false
             bg.style.animation = ``
-            document.getElementById("playbutton").removeAttribute("disabled")
+            document.getElementById("follow_mouse").removeAttribute("disabled")
             document.getElementById("playbutton").innerText = "Play"
         }, dur*1000)
     } else {
         clearTimeout(animationTimer)
         document.getElementById("playbutton").innerText = "Play"
+        document.getElementById("follow_mouse").removeAttribute("disabled")
         playing = false
         bg.style.animation = ``
     }
