@@ -20,7 +20,7 @@ function updateParameters() {
     for (let i = 0; i < WIDTH; i++) {
         start[i] = space;
     }
-    start[WIDTH/2] = fill;
+    start[Math.floor(WIDTH/2)] = fill;
 
     drawEMCA(getEMCA(ruleInput.value))
 }
@@ -32,7 +32,7 @@ let start = Array(WIDTH);
 for (let i = 0; i < WIDTH; i++) {
     start[i] = space;
 }
-start[WIDTH/2] = fill;
+start[Math.floor(WIDTH/2)] = fill;
 
 function drawEMCA(rows) {
     ctx.fillStyle = "white"
