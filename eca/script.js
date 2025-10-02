@@ -62,15 +62,19 @@ function drawEMCA(rows) {
     ctx.fillRect(0, 0, canvas.offsetWidth, canvas.offsetHeight)
     let cy = 0;
     let int = setInterval(function() {
-        for (let i = 0; i < WIDTH; i++) {
-            if (rows[cy][i]) {
-                ctx.fillStyle = "black";
-            } else {
-                ctx.fillStyle = "white";
+        let cyint;
+        for (cyint = 0; cyint < 100 && cyint + cy < HEIGHT; cyint++) {
+            for (let i = 0; i < WIDTH; i++) {
+                if (rows[cy+cyint][i]) {
+                    ctx.fillStyle = "black";
+                } else {
+                    ctx.fillStyle = "white";
+                }
+                ctx.fillRect(i*cellSize, (cy+cyint)*cellSize, cellSize, cellSize);
             }
-            ctx.fillRect(i*cellSize, cy*cellSize, cellSize, cellSize);
         }
-        if (++cy >= HEIGHT) {
+        cy += cyint;
+        if (cy >= HEIGHT) {
             clearInterval(int)
             bindControls()
             generatingLabel.innerText = ""
