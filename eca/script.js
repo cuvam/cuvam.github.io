@@ -4,6 +4,8 @@ const ruleInput = document.getElementById("ruleInput")
 const arenaWidthInput = document.getElementById("arenaWidthInput")
 const arenaHeightInput = document.getElementById("arenaHeightInput")
 const cellSizeInput = document.getElementById("cellSizeInput")
+const startStateInput = document.getElementById("startStateInput")
+const registerStartStateInput = document.getElementById("registerStartStateInput")
 
 let WIDTH =  arenaWidthInput.value;
 let HEIGHT = arenaHeightInput.value;
@@ -16,11 +18,7 @@ function updateParameters() {
     
     canvas.setAttribute("width", WIDTH*cellSize)
     canvas.setAttribute("height", HEIGHT*cellSize)
-
-    for (let i = 0; i < WIDTH; i++) {
-        start[i] = space;
-    }
-    start[Math.floor(WIDTH/2)] = fill;
+    startStateInput.setAttribute("max", WIDTH-1)
 
     drawEMCA(getEMCA(ruleInput.value))
 }
@@ -80,3 +78,10 @@ ruleInput.onchange = updateParameters
 arenaWidthInput.onchange = updateParameters
 arenaHeightInput.onchange = updateParameters
 cellSizeInput.onchange = updateParameters
+
+registerStartStateInput.onclick = function() {
+    let ct = startStateInput.value
+    ct = Math.max(Math.min(WIDTH-1, ct), 0)
+    start[ct] = !start[ct]
+    updateParameters()
+}
