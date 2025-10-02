@@ -6,10 +6,32 @@ const arenaHeightInput = document.getElementById("arenaHeightInput")
 const cellSizeInput = document.getElementById("cellSizeInput")
 const startStateInput = document.getElementById("startStateInput")
 const registerStartStateInput = document.getElementById("registerStartStateInput")
+const generatingLabel = document.getElementById("generatingLabel")
 
 let WIDTH =  arenaWidthInput.value;
 let HEIGHT = arenaHeightInput.value;
 let cellSize = cellSizeInput.value;
+
+function bindControls() {
+    ruleInput.onchange = updateParameters
+    arenaWidthInput.onchange = updateParameters
+    arenaHeightInput.onchange = updateParameters
+    cellSizeInput.onchange = updateParameters
+    registerStartStateInput.onclick = function() {
+        let ct = startStateInput.value
+        ct = Math.max(Math.min(WIDTH-1, ct), 0)
+        start[ct] = !start[ct]
+        updateParameters()
+    }
+}
+
+function unbindControls() {
+    ruleInput.onchange = null
+    arenaWidthInput.onchange = null
+    arenaHeightInput.onchange = null
+    cellSizeInput.onchange = null
+    registerStartStateInput.onclick = null
+}
 
 function updateParameters() {
     WIDTH =  arenaWidthInput.value;
@@ -19,6 +41,8 @@ function updateParameters() {
     canvas.setAttribute("width", WIDTH*cellSize)
     canvas.setAttribute("height", HEIGHT*cellSize)
     startStateInput.setAttribute("max", WIDTH-1)
+
+    unbindControls() // prevent call to drawEMCA before previous one is finished
 
     drawEMCA(getEMCA(ruleInput.value))
 }
@@ -33,9 +57,11 @@ for (let i = 0; i < WIDTH; i++) {
 start[Math.floor(WIDTH/2)] = fill;
 
 function drawEMCA(rows) {
+    generatingLabel.innerText = "Generating..."
     ctx.fillStyle = "white"
     ctx.fillRect(0, 0, canvas.offsetWidth, canvas.offsetHeight)
-    for (let cy = 0; cy < HEIGHT; cy++) {
+    let cy = 0;
+    let int = setInterval(function() {
         for (let i = 0; i < WIDTH; i++) {
             if (rows[cy][i]) {
                 ctx.fillStyle = "black";
@@ -44,7 +70,23 @@ function drawEMCA(rows) {
             }
             ctx.fillRect(i*cellSize, cy*cellSize, cellSize, cellSize);
         }
-    }
+        if (++cy >= HEIGHT) {
+            clearInterval(int)
+            bindControls()
+            generatingLabel.innerText = ""
+        }
+    }, 0)
+    // This code is the same as above, except it draws in one go, which freezes the webpage temporarily for large outputs (no good!)
+    // for (let cy = 0; cy < HEIGHT; cy++) {
+    //     for (let i = 0; i < WIDTH; i++) {
+    //         if (rows[cy][i]) {
+    //             ctx.fillStyle = "black";
+    //         } else {
+    //             ctx.fillStyle = "white";
+    //         }
+    //         ctx.fillRect(i*cellSize, cy*cellSize, cellSize, cellSize);
+    //     }
+    // }
 }
 
 function getEMCA(rule = 30) {
@@ -74,14 +116,3 @@ function getEMCA(rule = 30) {
 }
 
 updateParameters()
-ruleInput.onchange = updateParameters
-arenaWidthInput.onchange = updateParameters
-arenaHeightInput.onchange = updateParameters
-cellSizeInput.onchange = updateParameters
-
-registerStartStateInput.onclick = function() {
-    let ct = startStateInput.value
-    ct = Math.max(Math.min(WIDTH-1, ct), 0)
-    start[ct] = !start[ct]
-    updateParameters()
-}
