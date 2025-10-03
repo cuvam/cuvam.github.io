@@ -1,5 +1,12 @@
 div {
     margin: 5px 5px 5px 5px;
+    text-align: center;
+    position: relative;
+}
+
+canvas {
+    display: block;
+    margin: 0 auto;
 }
 
 body {
