@@ -3,6 +3,7 @@ let algorithmSelect = document.getElementById("algorithmSelect")
 let playSort = document.getElementById("startSort")
 let canvasLabel = document.getElementById("canvasLabel")
 let delayInput = document.getElementById("delayInput")
+let arraySizeInput = document.getElementById("arraySizeInput")
 
 let ctx = canvas.getContext("2d")
 ctx.imageSmoothingEnabled = false
@@ -22,9 +23,8 @@ for (let i = 0; i < arrSize; i++) {
     arr[i] = i+1
 }
 
-let DELAY_MS = 50 // Adjust this value to control speed
+let DELAY_MS = 50
 
-// Update DELAY_MS when input changes
 delayInput.addEventListener("input", function() {
     let value = parseInt(delayInput.value)
     if (value >= 1) {
@@ -35,13 +35,36 @@ delayInput.addEventListener("input", function() {
     }
 })
 
+function reinitializeArray(newSize) {
+    arrSize = newSize
+    arr = Array(arrSize)
+    for (let i = 0; i < arrSize; i++) {
+        arr[i] = i + 1
+    }
+    isShuffled = false
+    drawArrayBars()
+}
+
+arraySizeInput.addEventListener("input", function() {
+    let value = parseInt(arraySizeInput.value)
+    if (value >= 2 && value <= 500) {
+        reinitializeArray(value)
+    } else if (value < 2) {
+        arraySizeInput.value = 2
+        reinitializeArray(2)
+    } else if (value > 500) {
+        arraySizeInput.value = 500
+        reinitializeArray(500)
+    }
+})
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 function drawArrayBars() {
-    let barWidth = Math.floor(canvas.offsetWidth/arrSize)
-    let heightUnit = Math.floor(canvas.offsetHeight/arrSize)
+    let barWidth = canvas.offsetWidth/arrSize
+    let heightUnit = canvas.offsetHeight/arrSize
     ctx.fillStyle = "white"
     ctx.fillRect(0, 0, canvas.offsetWidth, canvas.offsetHeight)
     ctx.fillStyle = "black"
@@ -125,22 +148,18 @@ async function mergeSort(left = 0, right = arrSize - 1) {
 }
 
 async function merge(left, mid, right) {
-    // Create a copy of the subarray to merge from
     let temp = []
     for (let i = left; i <= right; i++) {
         temp.push(arr[i])
     }
 
-    let i = 0 // Index for left subarray (temp[0] to temp[mid-left])
-    let j = mid - left + 1 // Index for right subarray (temp[mid-left+1] to temp[right-left])
-    let k = left // Index for merged array
+    let i = 0 
+    let j = mid - left + 1 
+    let k = screenLeft
 
-    // Merge elements back into arr in sorted order
     while (i <= mid - left && j <= right - left) {
         if (temp[i] <= temp[j]) {
-            // Move element from left subarray
             if (arr[k] !== temp[i]) {
-                // Find where temp[i] is in arr and swap it to position k
                 for (let pos = k; pos <= right; pos++) {
                     if (arr[pos] === temp[i]) {
                         await swap(k, pos)
@@ -150,9 +169,7 @@ async function merge(left, mid, right) {
             }
             i++
         } else {
-            // Move element from right subarray
             if (arr[k] !== temp[j]) {
-                // Find where temp[j] is in arr and swap it to position k
                 for (let pos = k; pos <= right; pos++) {
                     if (arr[pos] === temp[j]) {
                         await swap(k, pos)
@@ -165,7 +182,6 @@ async function merge(left, mid, right) {
         k++
     }
 
-    // Copy remaining elements from left subarray (if any)
     while (i <= mid - left) {
         if (arr[k] !== temp[i]) {
             for (let pos = k; pos <= right; pos++) {
@@ -179,7 +195,6 @@ async function merge(left, mid, right) {
         k++
     }
 
-    // Copy remaining elements from right subarray (if any)
     while (j <= right - left) {
         if (arr[k] !== temp[j]) {
             for (let pos = k; pos <= right; pos++) {
@@ -195,16 +210,12 @@ async function merge(left, mid, right) {
 }
 
 async function heapSort() {
-    // Build max heap
     for (let i = Math.floor(arrSize / 2) - 1; i >= 0; i--) {
         await sift_down(arrSize, i)
     }
 
-    // Extract elements from heap one by one
     for (let i = arrSize - 1; i > 0; i--) {
-        // Move current root to end
         await swap(0, i)
-        // Sift down the new root in the reduced heap
         await sift_down(i, 0)
     }
 }
@@ -215,22 +226,18 @@ async function sift_down(n, i) {
         let left = 2 * i + 1
         let right = 2 * i + 2
 
-        // If left child is larger than current largest
         if (left < n && arr[left] > arr[largest]) {
             largest = left
         }
 
-        // If right child is larger than current largest
         if (right < n && arr[right] > arr[largest]) {
             largest = right
         }
 
-        // If largest is still i, we're done
         if (largest === i) {
             break
         }
 
-        // Swap and continue sifting down
         await swap(i, largest)
         i = largest
     }
