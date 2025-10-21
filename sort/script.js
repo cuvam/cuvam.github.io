@@ -153,9 +153,9 @@ async function merge(left, mid, right) {
         temp.push(arr[i])
     }
 
-    let i = 0 
-    let j = mid - left + 1 
-    let k = screenLeft
+    let i = 0
+    let j = mid - left + 1
+    let k = left
 
     while (i <= mid - left && j <= right - left) {
         if (temp[i] <= temp[j]) {
