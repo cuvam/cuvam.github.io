@@ -24,7 +24,20 @@ for (let i = 0; i < arrSize; i++) {
     arr[i] = i+1
 }
 
-let DELAY_MS = 50
+let DELAY_MS = 10
+let lastSwapTime = 0
+let swapCount = 0
+
+function getRenderBatchSize() {
+    // For delays >= 10ms, render every swap (most computers can handle this delay fine)
+    if (DELAY_MS >= 10) return 1
+
+    // Target ~60 FPS (16.67ms per frame)
+    const TARGET_FRAME_TIME = 16.67
+    const batchSize = Math.max(1, Math.floor(TARGET_FRAME_TIME / DELAY_MS))
+
+    return Math.min(batchSize, 50)
+} 
 
 delayInput.addEventListener("input", function() {
     let value = parseInt(delayInput.value)
@@ -43,7 +56,6 @@ canvasWidthInput.addEventListener("input", function() {
         canvas.width = WIDTH
         canvas.style.width = WIDTH
         drawArrayBars()
-        // Update array size max to match new width
         arraySizeInput.max = WIDTH
         if (arrSize > WIDTH) {
             arraySizeInput.value = WIDTH
@@ -117,12 +129,38 @@ async function swap(idxA, idxB) {
     let t = arr[idxA]
     arr[idxA] = arr[idxB]
     arr[idxB] = t
-    drawArrayBars()
-    await sleep(DELAY_MS)
+    swapCount++
+
+    const batchSize = getRenderBatchSize()
+
+    if (batchSize === 1) {
+        // Render and delay on every swap
+        drawArrayBars()
+        await sleep(DELAY_MS)
+    } else {
+        // Use batch rendering for very fast delays
+        if (swapCount === 1) {
+            lastSwapTime = performance.now()
+            drawArrayBars()
+            return
+        }
+
+        if (swapCount % batchSize === 0) {
+            drawArrayBars()
+
+            let expectedTime = swapCount * DELAY_MS
+            let actualTime = performance.now() - lastSwapTime
+
+            if (actualTime < expectedTime) {
+                await sleep(expectedTime - actualTime)
+            }
+        }
+    }
 }
 
 async function shuffleArray() {
     canvasLabel.style.visibility = "visible"
+    swapCount = 0
     for (let i = arrSize-1; i > 0; i--) {
         let ch = Math.floor(Math.random()*i)
         await swap(i, ch)
@@ -139,6 +177,7 @@ async function bubbleSort() {
             }
         }
     }
+    drawArrayBars()
 }
 
 async function insertionSort() {
@@ -149,9 +188,10 @@ async function insertionSort() {
             j--
         }
     }
+    drawArrayBars()
 }
 
-async function quickSort(left = 0, right = arrSize - 1) {
+async function quickSort(left = 0, right = arrSize - 1, isTopLevel = true) {
     if (left >= right) return
 
     let pivot = arr[right]
@@ -169,21 +209,23 @@ async function quickSort(left = 0, right = arrSize - 1) {
     await swap(i + 1, right)
     let pivotIndex = i + 1
 
-    await quickSort(left, pivotIndex - 1)
-    await quickSort(pivotIndex + 1, right)
+    await quickSort(left, pivotIndex - 1, false)
+    await quickSort(pivotIndex + 1, right, false)
+
+    if (isTopLevel) drawArrayBars()
 }
 
-async function mergeSort(left = 0, right = arrSize - 1) {
+async function mergeSort(left = 0, right = arrSize - 1, isTopLevel = true) {
     if (left >= right) return
 
     let mid = Math.floor((left + right) / 2)
 
-    // Sort left and right halves
-    await mergeSort(left, mid)
-    await mergeSort(mid + 1, right)
+    await mergeSort(left, mid, false)
+    await mergeSort(mid + 1, right, false)
 
-    // Merge the sorted halves
     await merge(left, mid, right)
+
+    if (isTopLevel) drawArrayBars()
 }
 
 async function merge(left, mid, right) {
@@ -257,6 +299,7 @@ async function heapSort() {
         await swap(0, i)
         await sift_down(i, 0)
     }
+    drawArrayBars()
 }
 
 async function sift_down(n, i) {
@@ -291,9 +334,13 @@ algorithms.set("heap_sort", heapSort)
 
 async function shufflethensort() {
     playSort.disabled = true
+    delayInput.disabled = true
+    arraySizeInput.disabled = true
+    canvasWidthInput.disabled = true
     if (!isShuffled) {
         await shuffleArray()
     }
+    swapCount = 0
     let chosen = algorithmSelect.value
     let chosenFunc = algorithms.get(chosen)
     if (chosenFunc) {
@@ -303,6 +350,9 @@ async function shufflethensort() {
         console.error(`Did not recognize algorithm ${chosen}`)
     }
     playSort.disabled = false
+    delayInput.disabled = false
+    arraySizeInput.disabled = false
+    canvasWidthInput.disabled = false
 }
 
 playSort.addEventListener("click", function() {
