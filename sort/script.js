@@ -9,7 +9,7 @@ let canvasWidthInput = document.getElementById("canvasWidthInput")
 let ctx = canvas.getContext("2d")
 ctx.imageSmoothingEnabled = false
 
-let WIDTH = 1000
+let WIDTH = 1024
 let HEIGHT = 500
 let isShuffled = false
 
