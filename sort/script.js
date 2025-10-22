@@ -47,14 +47,14 @@ function reinitializeArray(newSize) {
 
 arraySizeInput.addEventListener("input", function() {
     let value = parseInt(arraySizeInput.value)
-    if (value >= 2 && value <= 800) {
+    if (value >= 2 && value <= WIDTH) {
         reinitializeArray(value)
     } else if (value < 2) {
         arraySizeInput.value = 2
         reinitializeArray(2)
-    } else if (value > 800) {
-        arraySizeInput.value = 800
-        reinitializeArray(800)
+    } else if (value > WIDTH) {
+        arraySizeInput.value = WIDTH
+        reinitializeArray(WIDTH)
     }
 })
 
