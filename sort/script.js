@@ -4,11 +4,12 @@ let playSort = document.getElementById("startSort")
 let canvasLabel = document.getElementById("canvasLabel")
 let delayInput = document.getElementById("delayInput")
 let arraySizeInput = document.getElementById("arraySizeInput")
+let canvasWidthInput = document.getElementById("canvasWidthInput")
 
 let ctx = canvas.getContext("2d")
 ctx.imageSmoothingEnabled = false
 
-let WIDTH = 800
+let WIDTH = 1000
 let HEIGHT = 500
 let isShuffled = false
 
@@ -32,6 +33,44 @@ delayInput.addEventListener("input", function() {
     } else {
         delayInput.value = 1
         DELAY_MS = 1
+    }
+})
+
+canvasWidthInput.addEventListener("input", function() {
+    let value = parseInt(canvasWidthInput.value)
+    if (value >= 200 && value <= 2000) {
+        WIDTH = value
+        canvas.width = WIDTH
+        canvas.style.width = WIDTH
+        drawArrayBars()
+        // Update array size max to match new width
+        arraySizeInput.max = WIDTH
+        if (arrSize > WIDTH) {
+            arraySizeInput.value = WIDTH
+            reinitializeArray(WIDTH)
+        }
+    } else if (value < 200) {
+        canvasWidthInput.value = 200
+        WIDTH = 200
+        canvas.width = WIDTH
+        canvas.style.width = WIDTH
+        drawArrayBars()
+        arraySizeInput.max = WIDTH
+        if (arrSize > WIDTH) {
+            arraySizeInput.value = WIDTH
+            reinitializeArray(WIDTH)
+        }
+    } else if (value > 2000) {
+        canvasWidthInput.value = 2000
+        WIDTH = 2000
+        canvas.width = WIDTH
+        canvas.style.width = WIDTH
+        drawArrayBars()
+        arraySizeInput.max = WIDTH
+        if (arrSize > WIDTH) {
+            arraySizeInput.value = WIDTH
+            reinitializeArray(WIDTH)
+        }
     }
 })
 
