@@ -8,7 +8,7 @@ let arraySizeInput = document.getElementById("arraySizeInput")
 let ctx = canvas.getContext("2d")
 ctx.imageSmoothingEnabled = false
 
-let WIDTH = 64*10
+let WIDTH = 800
 let HEIGHT = 500
 let isShuffled = false
 
@@ -47,14 +47,14 @@ function reinitializeArray(newSize) {
 
 arraySizeInput.addEventListener("input", function() {
     let value = parseInt(arraySizeInput.value)
-    if (value >= 2 && value <= 500) {
+    if (value >= 2 && value <= 800) {
         reinitializeArray(value)
     } else if (value < 2) {
         arraySizeInput.value = 2
         reinitializeArray(2)
-    } else if (value > 500) {
-        arraySizeInput.value = 500
-        reinitializeArray(500)
+    } else if (value > 800) {
+        arraySizeInput.value = 800
+        reinitializeArray(800)
     }
 })
 
