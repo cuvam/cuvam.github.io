@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Incremancer Save Editor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .input-section {
+            max-width: 800px;
+            margin: 0 auto 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .title-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .help-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            background: #2196F3;
+            color: white;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: help;
+            position: relative;
+        }
+        .tooltip {
+            visibility: hidden;
+            width: 300px;
+            background-color: #333;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            top: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 13px;
+            font-weight: normal;
+            line-height: 1.4;
+        }
+        .tooltip::after {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent #333 transparent;
+        }
+        .help-icon:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-family: monospace;
+            margin-bottom: 10px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="input-section">
+        <div class="title-container">
+            <h1>Incremancer Save Editor</h1>
+            <span class="help-icon">?
+                <spa    n class="tooltip">Assumes an Incremancer: Chalice Mod save. Nothing will change if you are using vanilla, the first few values will just not affect your save. <strong>This editor is very literal; if you are editing seemingly esoteric sections of the save in terms of their possible values like <code>currentConstruction</code>, be careful because invalid inputs can corrupt the save!</strong></span>
+            </span>
+        </div>
+        <input type="text" id="saveInput" placeholder="Paste your encoded save file here">
+        <button onclick="initializeSaveEditor()">Load Save</button>
+    </div>
+    
+    <div id="editorContainer"></div>
+
+    <script>
+        let gamesave = null;
+
+        function decodeSaveFile(saveFileContent) {
+            try {
+                const decompressed = LZString.decompressFromEncodedURIComponent(saveFileContent);
+                const saveData = JSON.parse(decompressed);
+                return saveData;
+            } catch (error) {
+                console.error("Failed to decode save file:", error);
+                return null;
+            }
+        }
+
+        function encodeSaveFile(saveData) {
+            try {
+                const jsonString = JSON.stringify(saveData);
+                const compressed = LZString.compressToEncodedURIComponent(jsonString);
+                return compressed;
+            } catch (error) {
+                console.error("Failed to encode save file:", error);
+                return null;
+            }
+        }
+
+        function createEditableForm(saveData) {
+            gamesave = saveData;
+            
+            const container = document.createElement('div');
+            container.id = 'saveEditor';
+            container.style.cssText = 'padding: 20px; max-width: 800px; margin: 0 auto; font-family: monospace; background: white; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);';
+            
+            function setNestedValue(obj, path, value) {
+                const keys = path.split('.');
+                let current = obj;
+                
+                for (let i = 0; i < keys.length - 1; i++) {
+                    current = current[keys[i]];
+                }
+                
+                current[keys[keys.length - 1]] = value;
+            }
+            
+            function createFields(obj, path = '', parentDiv = null) {
+                const div = parentDiv || document.createElement('div');
+                
+                for (let key in obj) {
+                    const value = obj[key];
+                    const currentPath = path ? `${path}.${key}` : key;
+                    
+                    if (value === null || value === undefined) {
+                        continue;
+                    }
+                    
+                    if (typeof value === 'object' && !Array.isArray(value)) {
+                        const section = document.createElement('details');
+                        section.style.cssText = 'margin: 10px 0; padding: 10px; border: 1px solid #ccc; background: #f9f9f9;';
+                        section.open = true;
+                        
+                        const summary = document.createElement('summary');
+                        summary.textContent = key;
+                        summary.style.cssText = 'font-weight: bold; cursor: pointer; margin-bottom: 10px;';
+                        section.appendChild(summary);
+                        
+                        createFields(value, currentPath, section);
+                        div.appendChild(section);
+                    } else if (Array.isArray(value)) {
+                        const section = document.createElement('details');
+                        section.style.cssText = 'margin: 10px 0; padding: 10px; border: 1px solid #ccc; background: #f0f0f0;';
+                        section.open = false;
+                        
+                        const summary = document.createElement('summary');
+                        summary.textContent = `${key} (Array, ${value.length} items)`;
+                        summary.style.cssText = 'font-weight: bold; cursor: pointer; margin-bottom: 10px;';
+                        section.appendChild(summary);
+                        
+                        const arrayDiv = document.createElement('div');
+                        arrayDiv.innerHTML = `<textarea rows="10" style="width: 100%; font-family: monospace;">${JSON.stringify(value, null, 2)}</textarea>`;
+                        
+                        const textarea = arrayDiv.querySelector('textarea');
+                        textarea.addEventListener('change', function() {
+                            try {
+                                const parsed = JSON.parse(this.value);
+                                setNestedValue(gamesave, currentPath, parsed);
+                            } catch (e) {
+                                alert('Invalid JSON: ' + e.message);
+                            }
+                        });
+                        
+                        section.appendChild(arrayDiv);
+                        div.appendChild(section);
+                    } else {
+                        const fieldDiv = document.createElement('div');
+                        fieldDiv.style.cssText = 'margin: 5px 0; display: flex; align-items: center;';
+                        
+                        const label = document.createElement('label');
+                        label.textContent = key + ': ';
+                        label.style.cssText = 'width: 200px; font-weight: bold;';
+                        
+                        const input = document.createElement('input');
+                        input.type = typeof value === 'number' ? 'number' : 'text';
+                        input.value = value;
+                        input.style.cssText = 'flex: 1; padding: 5px;';
+                        
+                        input.addEventListener('change', function() {
+                            let newValue = this.value;
+                            
+                            if (typeof value === 'number') {
+                                newValue = parseFloat(newValue);
+                            } else if (typeof value === 'boolean') {
+                                newValue = newValue === 'true';
+                            }
+                            
+                            setNestedValue(gamesave, currentPath, newValue);
+                        });
+                        
+                        fieldDiv.appendChild(label);
+                        fieldDiv.appendChild(input);
+                        div.appendChild(fieldDiv);
+                    }
+                }
+                
+                return div;
+            }
+            
+            const formDiv = createFields(saveData);
+            container.appendChild(formDiv);
+            
+            const exportSection = document.createElement('div');
+            exportSection.style.cssText = 'margin-top: 20px; padding: 20px; border: 2px solid #333; background: #fff;';
+            
+            const exportButton = document.createElement('button');
+            exportButton.textContent = 'Generate Encoded Save';
+            exportButton.style.cssText = 'padding: 10px 20px; font-size: 16px; cursor: pointer; margin-bottom: 10px;';
+            exportButton.onclick = function() {
+                const encoded = encodeSaveFile(gamesave);
+                outputTextarea.value = encoded;
+                outputTextarea.select();
+            };
+            
+            const outputLabel = document.createElement('label');
+            outputLabel.textContent = 'Encoded Save File:';
+            outputLabel.style.cssText = 'display: block; font-weight: bold; margin-bottom: 5px;';
+            
+            const outputTextarea = document.createElement('textarea');
+            outputTextarea.id = 'encodedOutput';
+            outputTextarea.rows = 10;
+            outputTextarea.style.cssText = 'width: 100%; font-family: monospace;';
+            outputTextarea.placeholder = 'Click "Generate Encoded Save" to create the encoded save file...';
+            
+            const copyButton = document.createElement('button');
+            copyButton.textContent = 'Copy to Clipboard';
+            copyButton.style.cssText = 'padding: 10px 20px; font-size: 14px; cursor: pointer; margin-top: 10px;';
+            copyButton.onclick = function() {
+                outputTextarea.select();
+                document.execCommand('copy');
+                alert('Copied to clipboard!');
+            };
+            
+            exportSection.appendChild(exportButton);
+            exportSection.appendChild(outputLabel);
+            exportSection.appendChild(outputTextarea);
+            exportSection.appendChild(copyButton);
+            
+            container.appendChild(exportSection);
+            
+            return container;
+        }
+
+        function initializeSaveEditor() {
+            const container = document.getElementById('editorContainer');
+            const inputValue = document.getElementById('saveInput').value;
+            
+            if (!inputValue) {
+                alert('Please paste a save file first!');
+                return;
+            }
+            
+            const decoded = decodeSaveFile(inputValue);
+            
+            if (!decoded) {
+                alert('Failed to decode save file!');
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            const editor = createEditableForm(decoded);
+            container.appendChild(editor);
+        }
+    </script>
+</body>
+</html>
