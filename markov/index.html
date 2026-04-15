@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markov Chain Generator</title>
+</head>
+<body>
+    <div id="input-section">
+        <h2>Input</h2>
+        <label for="input-content">Input Content:</label>
+        <textarea id="input-content" name="input-content" rows="10" cols="50"></textarea>
+
+        <label for="markov-order">Markov Chain Order:</label>
+        <input type="number" id="markov-order" name="markov-order" min="1" value="2">
+
+        <label for="output-tokens">Number of Output Tokens:</label>
+        <input type="number" id="output-tokens" name="output-tokens" min="1" value="100">
+
+        <button id="generate-btn" type="button">Generate</button>
+    </div>
+
+    <div id="output-section">
+        <h2>Output</h2>
+        <textarea id="output-text" name="output-text" rows="10" cols="50" readonly></textarea>
+        <button id="copy-btn" type="button">Copy</button>
+    </div>
+
+    <script>
+        function buildMarkovDict(words, order) {
+            const dict = {};
+            for (let i = 0; i <= words.length - order - 1; i++) {
+                const key = words.slice(i, i + order).join(' ');
+                const next = words[i + order];
+                if (!dict[key]) dict[key] = [];
+                dict[key].push(next);
+            }
+            return dict;
+        }
+
+        function generateText(dict, order, numTokens, words) {
+            const keys = Object.keys(dict);
+            if (keys.length === 0) return '';
+
+            const startIdx = Math.floor(Math.random() * (words.length - order));
+            let current = words.slice(startIdx, startIdx + order);
+            const output = [...current];
+
+            for (let i = 0; i < numTokens - order; i++) {
+                const key = current.join(' ');
+                const choices = dict[key];
+                if (!choices || choices.length === 0) {
+                    const randomKey = keys[Math.floor(Math.random() * keys.length)];
+                    current = randomKey.split(' ');
+                    continue;
+                }
+                const next = choices[Math.floor(Math.random() * choices.length)];
+                output.push(next);
+                current = [...current.slice(1), next];
+            }
+
+            return output.join(' ');
+        }
+
+        document.getElementById('generate-btn').addEventListener('click', () => {
+            const content = document.getElementById('input-content').value.trim();
+            const order = parseInt(document.getElementById('markov-order').value, 10);
+            const numTokens = parseInt(document.getElementById('output-tokens').value, 10);
+
+            const words = content.split(/\s+/).filter(w => w.length > 0);
+            if (words.length <= order) {
+                document.getElementById('output-text').value = 'Input content too short for the specified order.';
+                return;
+            }
+
+            const dict = buildMarkovDict(words, order);
+            const result = generateText(dict, order, numTokens, words);
+            document.getElementById('output-text').value = result;
+        });
+
+        document.getElementById('copy-btn').addEventListener('click', () => {
+            const output = document.getElementById('output-text');
+            output.select();
+            document.execCommand('copy');
+        });
+    </script>
+</body>
+</html>
