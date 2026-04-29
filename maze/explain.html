@@ -99,7 +99,7 @@ th { padding: 0.4em 0.7em; text-align: left; }
 
 <p>Two walls per cell is the minimum needed to fully describe a rectangular maze without redundancy. Encoding only the bottom and right walls means each cell's data is independent of its neighbors&rsquo; data, and the outer border (top edge of row 0, left edge of column 0) is implicit.</p>
 
-<p>The 2-bit value-per-cell maps cleanly to a single decimal digit (0&ndash;3), keeping the textual output compact and easy to parse. Also worth noting that the actual output includes a "start" point at the top left (which excepts the left outer wall for the 0,0 cell) and a "goal" point at the bottom right (which excepts the right wall for the X-1,Y-1 cell for a maze of size X,Y.).</p>
+<p>Note that the output also implies two openings in the outer border: a "start" point at the top-left, which omits the left outer wall of cell (0,0), and a "goal" point at the bottom-right, which omits the right outer wall of cell (X-1, Y-1) for a maze of size X by Y.</p>
 
 <p><a href="https://cuvam.github.io/maze">&larr; back to maze generator</a></p>
 
