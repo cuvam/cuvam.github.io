@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Maze Output Format</title>
+<link rel="stylesheet" href="https://cs16.samke.me/css/cs16.css">
+<style>
+body { padding: 2em; max-width: 50em; margin: auto; }
+table { border-collapse: collapse; margin: 1em 0; }
+td { border: 1px solid black; padding: 0.4em 0.7em; text-align: center; }
+th { padding: 0.4em 0.7em; text-align: left; }
+.example {
+    font-family: monospace;
+    background: rgba(0,0,0,0.1);
+    padding: 0.5em;
+    display: inline-block;
+}
+.cell-grid {
+    display: inline-block;
+    border: 2px solid black;
+    background: white;
+    padding: 0;
+    margin: 0.5em;
+}
+.cell-grid svg { display: block; }
+</style>
+</head>
+<body>
+
+<h1>Output Format</h1>
+
+<p>The textbox below the maze contains a per-cell encoding of which walls exist. Each cell is represented by a single digit (0&ndash;3), and each row is terminated by a <code>|</code> character.</p>
+
+<h2>Per-cell encoding</h2>
+
+<p>Each digit encodes the state of two walls of the cell as a 2-bit value:</p>
+
+<ul>
+    <li>Bit 0 (value 1) &mdash; bottom wall</li>
+    <li>Bit 1 (value 2) &mdash; right wall</li>
+</ul>
+
+<p>The top and left walls are not encoded per-cell, because they are the bottom/right walls of the neighboring cells (or the outer maze border).</p>
+
+<table>
+    <tr><th>Digit</th><th>Bottom wall</th><th>Right wall</th><th>Cell looks like</th></tr>
+    <tr>
+        <td><code>0</code></td><td>no</td><td>no</td>
+        <td><span class="cell-grid"><svg width="40" height="40"><rect x="0" y="0" width="40" height="40" fill="white"/></svg></span></td>
+    </tr>
+    <tr>
+        <td><code>1</code></td><td>yes</td><td>no</td>
+        <td><span class="cell-grid"><svg width="40" height="40"><rect x="0" y="0" width="40" height="40" fill="white"/><line x1="0" y1="40" x2="40" y2="40" stroke="black" stroke-width="3"/></svg></span></td>
+    </tr>
+    <tr>
+        <td><code>2</code></td><td>no</td><td>yes</td>
+        <td><span class="cell-grid"><svg width="40" height="40"><rect x="0" y="0" width="40" height="40" fill="white"/><line x1="40" y1="0" x2="40" y2="40" stroke="black" stroke-width="3"/></svg></span></td>
+    </tr>
+    <tr>
+        <td><code>3</code></td><td>yes</td><td>yes</td>
+        <td><span class="cell-grid"><svg width="40" height="40"><rect x="0" y="0" width="40" height="40" fill="white"/><line x1="0" y1="40" x2="40" y2="40" stroke="black" stroke-width="3"/><line x1="40" y1="0" x2="40" y2="40" stroke="black" stroke-width="3"/></svg></span></td>
+    </tr>
+</table>
+
+<h2>Row separators</h2>
+
+<p>Each row of the maze is terminated by a <code>|</code> character. Rows are listed top-to-bottom, cells within a row left-to-right.</p>
+
+<h2>Worked example</h2>
+
+<p>Consider this 4-character string for a 2&times;2 maze:</p>
+
+<p class="example">21|03|</p>
+
+<p>This decodes as:</p>
+
+<table>
+    <tr><th>Position</th><th>Digit</th><th>Walls</th></tr>
+    <tr><td>row 0, col 0</td><td><code>2</code></td><td>right wall only</td></tr>
+    <tr><td>row 0, col 1</td><td><code>1</code></td><td>bottom wall only</td></tr>
+    <tr><td>row 1, col 0</td><td><code>0</code></td><td>no walls</td></tr>
+    <tr><td>row 1, col 1</td><td><code>3</code></td><td>bottom and right walls</td></tr>
+</table>
+
+<p>Rendered (with the implicit outer border drawn in for clarity):</p>
+
+<span class="cell-grid"><svg width="80" height="80">
+    <rect x="0" y="0" width="80" height="80" fill="white"/>
+    <!-- outer border -->
+    <rect x="0" y="0" width="80" height="80" fill="none" stroke="black" stroke-width="3"/>
+    <!-- (0,0) right wall -->
+    <line x1="40" y1="0" x2="40" y2="40" stroke="black" stroke-width="3"/>
+    <!-- (0,1) bottom wall -->
+    <line x1="40" y1="40" x2="80" y2="40" stroke="black" stroke-width="3"/>
+    <!-- (1,1) bottom and right walls are part of the outer border -->
+</svg></span>
+
+<h2>Why this format</h2>
+
+<p>Two walls per cell is the minimum needed to fully describe a rectangular maze without redundancy. Encoding only the bottom and right walls means each cell's data is independent of its neighbors&rsquo; data, and the outer border (top edge of row 0, left edge of column 0) is implicit.</p>
+
+<p>The 2-bit value-per-cell maps cleanly to a single decimal digit (0&ndash;3), keeping the textual output compact and easy to parse.</p>
+
+<p><a href="https://cuvam.github.io/maze">&larr; back to maze generator</a></p>
+
+</body>
+</html>
